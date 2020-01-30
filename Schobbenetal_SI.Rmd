@@ -1088,7 +1088,7 @@ all.CD.wide <- all.CD.wide %>%
                       Mo_U  =  Mo / U)
 
 #-------------------------------------------
-# PAAS element values (Wedepohl, 1971, 1990)
+# PAAS element values (Wedepohl, 1971, 1991)
 #-------------------------------------------
 
 ls.Chem$PAAS <- data.frame(value = 
