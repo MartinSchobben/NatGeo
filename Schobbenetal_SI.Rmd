@@ -3,12 +3,13 @@ output:
   bookdown::word_document2:
     fig_caption: true
     pandoc_args: [
-      "--csl", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/common/nature-geoscience.csl", "--citation-abbreviations", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/common/abbreviations.json",
-       "--reference-doc", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/common/word-style-ref2.docx"
+      "--csl", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/abbreviations.json",
+       "--reference-doc", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/word-style-ref1.docx"
        ]
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
+subtitle: "Supplementary Information file"
 author: 
-- Martin Schobben^[School of Earth and Environment, University of Leeds, Woodhouse Lane, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, Invalidenstr. 43, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik Svensen^4^, Sverre Planke^4^, David P.G.Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, The Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
+- Martin Schobben^[School of Earth and Environment, University of Leeds, Woodhouse Lane, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, Invalidenstr. 43, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G.Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, The Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
 bibliography: biblio.bib
 ---
 
@@ -21,10 +22,7 @@ knitr::opts_chunk$set(echo = FALSE,
                       dpi = 300, 
                       digits = 2)
 
-
-
 #required packages
-
 
 # following code for loading and writing the bibtex references for the used 
 # packages is adapted from the blog post: //www.r-bloggers.com/bibliography-with-knitr-cite-your-references-and-packages/,
@@ -82,7 +80,7 @@ rref<- rref %>%
   enframe() %>% 
   mutate(value = "@rversion")
 
-data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/"
+data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/"
 
 ```
 
@@ -296,7 +294,7 @@ all.TOC <- all.TOC %>% mutate(value = ((1 - ((weight_tube_gram +
 ```
 
 
-```{r }
+```{r}
 
 #===============================================================================
 # isotope data 
@@ -804,6 +802,7 @@ text.2  <-  grid.text(label= "Pangaea",  x=unit(0.95,"npc"), y=unit(0.79,"npc"),
 text.3  <-  grid.text(label= "Barents \n Sea",  x=unit(0.885,"npc"), y=unit(0.845 ,"npc"), rot= -15, gp=gpar(fontsize=5), draw=FALSE)
 text.4  <-  grid.text(label= "Sverdrup \n Basin",  x=unit(0.81,"npc"), y=unit(0.83,"npc"), rot=-25, gp=gpar(fontsize=5), draw=FALSE)
 text.5  <-  grid.text(label= "Siberian Traps",  x=unit(0.9,"npc"), y=unit(0.94 ,"npc"), rot= 15, gp=gpar(fontsize=5), draw=FALSE)
+text.6  <-  grid.text(label= "Permian–Triassic (251.9 Mya)",  x=unit(0.2,"npc"), y=unit(0.94 ,"npc"),  gp=gpar(fontsize=7), draw=FALSE)
 circ.1 <-  grid.circle(r=unit(0.012, "npc"), x=unit(0.855,"npc"), y=unit(0.805,"npc"), gp=gpar(fill=FALSE, col= "black", ltw=2), draw=FALSE)
 
 gg <- gtable_add_grob(gg, a, 1, 1, z=1, name="a")
@@ -818,6 +817,7 @@ gg <- gtable_add_grob(gg, text.2, 1, 1, z=Inf, name="Pangaea")
 gg <- gtable_add_grob(gg, text.3, 1, 1, z=Inf, name="Barents")
 gg <- gtable_add_grob(gg, text.4, 1, 1, z=Inf, name="Sverdrup")
 gg <- gtable_add_grob(gg, text.5, 1, 1, z=Inf, name="Traps")
+gg <- gtable_add_grob(gg, text.6, 1, 1, z=Inf, name="PTr")
 
 # drawing the geographic map of Spitsbergen with associated elements
 grid.draw(gg)
@@ -829,21 +829,21 @@ ggsave(paste0(data.path, "figures/SuppFig2.tiff"), gg )
 
 # Lithostratigraphy and facies description
 
-The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with subordinate cherty shales, brachiopod and bryozoan-rich limestones and glauconitic sandstones[@Blomeier2013; @Dustira2013, @Bond2015]. Although substantial differences between the lithologies of outer Isfjorden of western-most Spitsbergen (Festningen) and inner Isfjorden of central Spitsbergen (Deltadalen), which has led to the proposal of two distinct members; the Hovtinden and Stensiöfjellet members, respectively, these units grade laterally into each other (Supplementary Fig \@ref(fig:FigLithostrat))[@Blomeier2013] and can therefore be correlated.  These two lithologies are interpreted to record shallow marine, high energy conditions in the inner Isfjorden (Stensiöfjellet Member) whilst dark shales and cherts dominated in more distal, deeper locations (Hovtinden Member) that occurred in the outer Isfjorden[@Blomeier2013; @Bond2017]. Our study section at Festningen comprises the most expanded development of the Kapp Starostin Formation and has relatively thin beds of limestone indicating its distal, deep water development compared to the more easterly Deltadalen site. This sand-rich site was probably part of the inner sandy shelf that developed in north and east Spitsbergen in the Permian (Supplementary Fig \@ref(fig:FigGeograph)).
+The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with subordinate cherty mudstones, brachiopod and bryozoan-rich limestones and glauconitic sandstones[@Blomeier2013; @Dustira2013, @Bond2015, @Zuchuat]. Although substantial differences between the lithologies of outer Isfjorden of western-most Spitsbergen (Festningen) and inner Isfjorden of central Spitsbergen (Deltadalen), which has led to the proposal of two distinct members; the Hovtinden and Stensiöfjellet members, respectively, these units grade laterally into each other (Supplementary Fig \@ref(fig:FigLithostrat))[@Blomeier2013] and can therefore be correlated.  These two lithologies are interpreted to record shallow marine, high energy conditions in the inner Isfjorden (Stensiöfjellet Member)[@Zuchuat] whilst dark mudstones and cherts dominated in more distal, deeper locations (Hovtinden Member) that occurred in the outer Isfjorden[@Blomeier2013; @Bond2017]. Our study section at Festningen comprises the most expanded development of the Kapp Starostin Formation and has relatively thin beds of limestone indicating its distal, deep water development compared to the more easterly Deltadalen site. This sand-rich site was probably part of the inner sandy shelf that developed in north and east Spitsbergen in the Permian (Supplementary Fig \@ref(fig:FigGeograph)).
 
 
-```{r  FigLithostrat,  anchor="figure", out.width="80%", fig.cap="Detailed lithology logs of the Deltadalen core and Festningen outcrop as well as a correlation scheme linking both sections."}
+```{r  FigLithostrat,  anchor="figure", out.width="80%", fig.cap="Detailed lithology logs of the Deltadalen core and Festningen outcrop as well as a correlation scheme linking both sections. Location of the Permian--Triassic after ref @Zuchuat."}
 
 knitr::include_graphics("figures/SuppFig3.png")
 
 ```
 
 
-During the Early Triassic the west-to-east thinning of the stratigraphy persisted although the facies became dominated by fine-grained clastic material (of the Vardebukta and  Vikinghøgda formations in the outer and inner Isfjorden, respectively) following the demise of siliceous sponges[@Wignall2016; @Foster2017]. However, glauconitic sandstones persist 1.6$\,$m above the the base of the Vikinghøgda Formation but the lithology is different from the underlying unit as it lacks diagenetic chert nodules (Supplementary Fig \@ref(fig:FigLithostrat))[@Mork1999; @Nabbefeld2010; @Foster2017]. The deposition of these units occurred in an open-marine shelf setting[@Mork1999]. Initially, during the P--Tr boundary interval, deepest-water facies continued to be developed in the Festningen area. Progradation of sandy shoreface facies from a sediment source to the west saw shallower water conditions developed in this area later in the Early Triassic[@Wignall2016]. 
+During the Early Triassic the west-to-east thinning of the stratigraphy persisted although the facies became dominated by fine-grained clastic material (of the Vardebukta and  Vikinghøgda formations in the outer and inner Isfjorden, respectively) following the demise of siliceous sponges[@Wignall2016; @Foster2017]. However, glauconitic sandstones persist 1.5$\,$m above the the base of the Vikinghøgda Formation but the lithology is different from the underlying unit as it lacks diagenetic chert nodules (Supplementary Fig \@ref(fig:FigLithostrat))[@Mork1999; @Nabbefeld2010; @Foster2017; @Zuchuat]. Although some signs of condensation exist in the upper meter of the Kapp Starostin Formation at Deltadalen,  there are no erosive surfaces, and so no significant gaps are present in this sequence[@Zuchuat]. The deposition of these units occurred in an open-marine shelf setting[@Mork1999]. Initially, during the P--Tr boundary interval, deepest-water facies continued to be developed in the Festningen area. Progradation of sandy shoreface facies from a sediment source to the west saw shallower water conditions developed in this area later in the Early Triassic[@Wignall2016]. 
 
 # Chronology
 
-The uppermost beds of the Kapp Starostin Formation are of Late Permian age, where the whole lithological unit (~380$\,$m at Festningen) comprises a long time interval (Artinskian--Changhsingian), based on bryozoa, foraminifera, conodont, and brachiopod biostratigraphy as well as $\delta$^13^C chemostratigraphy[@Nakrem1992; @Dustira2013; @Blomeier2013; @Bond2017]. The abrupt lithological shift at the formation boundary has been interpreted as the die-off of a prolific silica producing metazoan community (sponges)(Supplementary Fig \@ref(fig:FigLithostrat)), and also contains the disappearance of deep-tiered ichno fossil *Zoophycos*, which is synchronous with the global-scale biotic crisis[@Wignall1996]. Although faint signs of life persist in the form of bioturbation in the shale facies up to a height of ~3$\,$m above the base of the Vardebukta Formation at Festningen (Supplementary Fig \@ref(fig:FigLithostrat)), whereafter burrows disappear and sediments become finely laminated. A glauconitic sandstone unit, occurring above the base of the Vikinghøgda Formation (Supplementary Fig \@ref(fig:FigLithostrat)) and contains a diverse ichno fabric assemblage and, as such, the extinction horizon is placed above this unit[@Foster2017]. Occurrences of the ammonite *Otoceras boreale*, the conodont *Clarkina carinata* and species of the bivalve *Claraia*, 5--10$\,$m above the base of the Vardebukta and Vikinghøgda formations are the only age-diagnostic fossils for the Griesbachian (earliest Triassic)[@Harland1997; @Wignall1996; @Mork1999; @Nakrem2008]. Based on these considerations, a latest Permian age has been inferred for the shale and sandstone units above the formational boundary of Festningen and Deltadalen, respectively[@Wignall1996; @Dustira2013; @Nabbefeld2010; @Foster2017]. Carbon isotope based chemostratigraphy offers an alternative, more refined age control, where P--Tr event beds worldwide record a long-term negative $\delta$^13^C anomaly that relates to a perturbation of the global biogeochemical carbon cycle[@Korte2010]. Based on this premise, the $\delta$^13^C~TOC~ minimum has been used as an alternative stratigraphic marker for P--Tr boundary sequences in Spitsbergen, which have so far not yielded the marker conodont species *Hindeodus parvus* that defines the P--Tr boundary worldwide[@Wignall1998; @Dustira2013; @Grasby2015a]. Adopting this approach helped define the position of the P--Tr boundary in both sequences (Fig. 1 and Supplementary Fig \@ref(fig:FigLithostrat)), and suggests that the successions record an age range of roughly Changhsingian to earliest Triassic.
+The uppermost beds of the Kapp Starostin Formation are of Late Permian age, where the whole lithological unit (~380$\,$m at Festningen) comprises a long time interval (Artinskian--Changhsingian), based on bryozoa, foraminifera, conodont, and brachiopod biostratigraphy as well as $\delta$^13^C chemostratigraphy[@Nakrem1992; @Dustira2013; @Blomeier2013; @Bond2017]. The abrupt lithological shift at the formation boundary has been interpreted as the die-off of a prolific silica producing metazoan community (sponges)(Supplementary Fig \@ref(fig:FigLithostrat)), and also contains the disappearance of deep-tiered ichno fossil *Zoophycos*, which is synchronous with the global-scale biotic crisis[@Wignall1996]. Although faint signs of life persist in the form of bioturbation in the mudstone facies up to a height of ~3$\,$m above the base of the Vardebukta Formation at Festningen (Supplementary Fig \@ref(fig:FigLithostrat)), whereafter burrows disappear and sediments become finely laminated. A glauconitic sandstone unit, occurring above the base of the Vikinghøgda Formation (Supplementary Fig \@ref(fig:FigLithostrat)) and contains a diverse ichno fabric assemblage and, as such, the extinction horizon is placed above this unit[@Foster2017]. Occurrences of the ammonite *Otoceras boreale* and species of the bivalve *Claraia*, 4--10$\,$m above the base of the Vardebukta and Vikinghøgda formations are age-diagnostic fossils for the Griesbachian (earliest Triassic)[@Harland1997; @Wignall1996; @Mork1999; @Nakrem2008; @Zuchuat]. Furthermore, at Deltadalen the marker conodont species *Hindeodus parvus* that defines the P--Tr boundary worldwide has recently been uncovered[@Zuchuat]. Based on these considerations, a latest Permian age has been inferred for the mudstone and sandstone units above the formational boundary of Festningen and Deltadalen, respectively[@Wignall1996; @Dustira2013; @Nabbefeld2010; @Foster2017; @Zuchuat]. Carbon isotope based chemostratigraphy offers an alternative refined age control, where P--Tr event beds worldwide record a long-term negative $\delta$^13^C anomaly that relates to a perturbation of the global biogeochemical carbon cycle[@Korte2010]. Based on this premise, the $\delta$^13^C~TOC~ minimum has been used as an alternative stratigraphic marker for P--Tr boundary sequence at Festningen, which have so far not yielded the marker conodont species *Hindeodus parvus*[@Wignall1998; @Grasby2015a]. Adopting this approach helped define the position of the P--Tr boundary in both sequences (Fig. 1 and Supplementary Fig \@ref(fig:FigLithostrat)), and suggests that the successions record an age range of roughly Changhsingian to earliest Triassic.
 
 # Materials
 
@@ -896,6 +896,7 @@ good <-c(section.ID = "section ID", section = "section", height = "height (m)",
 
 # save all the different files for each of the sections
 df.extr <- all.CD.wide  %>%  
+           filter(section != "Akkamori") %>% 
            group_by(section) %>% 
            arrange_at(vars(section, contains("height")), desc) %>% 
 # rename columns  
@@ -1123,8 +1124,6 @@ all.CD.wide <- all.CD.wide %>%
                         pull(value)
                       )
 
-# exclude when P recovery is over 1.3 (mean + 1SD)
-#all.CD.wide <- all.CD.wide %>% filter(near(HRP_P_max, mean(HRP_P_max), sd(HRP_P_max)))
 
 #-------------------------------------------
 # complete dataset for subsequent processing
@@ -1165,7 +1164,7 @@ ls.Chem$SGR <- data.frame(phase = c("Fe", "P", "Al", "Mo", "U"),
                           mutate(name = "SGR 1b")
 
 #---------------------------
-#external reproducibility
+# external reproducibility
 #---------------------------
 # summary statistics external standards Fe spec
 sum.QC.Fe <- all.QC %>% 
@@ -1442,7 +1441,7 @@ dev.off()
 
 ```              
               
-```{r FigPetro, fig.cap = "Microscale mineralogical and elemental variations mapped for A--B) Deltadalen at 95.9$\\,$m depth, and C--D) Festningen 1.6$\\,$m height. Note, that the fine sand-sized clast of Deltadalen are composed of quartz and apatite shell fragments (likely belonging to the inarticulate brachiopods) with porespaces occupied by glauconite and authigenic apatite infillings. Clasts of Festningen are clay-sized, and, although, P is detected with EDS, P bearing minerals could not be identified. The mineral assemblage is dominated by dolomite, ankerite  and  sheet silicates.", out.width="200%"}
+```{r FigPetro, fig.cap = "Microscale mineralogical and elemental variations mapped for A--B) Deltadalen at 95.9$\\,$m depth, and C--D) Festningen 1.6$\\,$m height above the base of the Vardebukta Formation. Note, that the fine sand-sized clast of Deltadalen are composed of quartz and apatite shell fragments (likely belonging to the inarticulate brachiopods) with porespaces occupied by glauconite and authigenic apatite infillings. Clasts of Festningen are clay-sized, and, although, P is detected with EDS, P bearing minerals could not be identified. The mineral assemblage is dominated by dolomite, ankerite  and  sheet silicates.", out.width="200%"}
 
 knitr::include_graphics('figures/SuppFig4.tiff')
               
@@ -1512,9 +1511,9 @@ knitr::include_graphics('figures/SuppFig6.jpg')
 
 ### Ichnology
 
-**Deltadalen.** The glauconitic sandstones of the Kapp Starostin Formation and the basal part of the Vikinghøgda Formation are highly bioturbated with the bedding completely disturbed and discrete trace fossils are still visible in some places, giving an ichnofabric index (ii)[@Droser1986] value of 5 (Supplementary Fig. \@ref(fig:FigLithostrat)). The discrete trace fossils identified in these beds include *Zoophycos*, *Thalassinoides*, and *Rhizocorallium*, which are preserved in full relief. Below the last glauconitic sandstone bed at Deltadalen there is a 20$\,$cm black siltstone bed that is less than 10% bioturbated (ii2). The mudstones that overly the glauconitic sandstones, and represent the post-extinction strata, do not record any bioturbation (ii1). 
+**Deltadalen.** The glauconitic sandstones of the Kapp Starostin Formation and the basal part of the Vikinghøgda Formation are highly bioturbated with the bedding completely disturbed and discrete trace fossils are still visible in some places, giving an ichnofabric index (ii)[@Droser1986] value of 5 (Supplementary Fig. \@ref(fig:FigLithostrat)). The discrete trace fossils identified in these beds include *Zoophycos*, *Thalassinoides*, and *Rhizocorallium*, which are preserved in full relief. Below the last glauconitic sandstone bed at Deltadalen there is a 20$\,$cm black siltstone bed that is less than 10% bioturbated (ii2). The mudstones that overly the glauconitic sandstones, and represent the post-extinction strata, do not record any macroscopic bioturbation (ii1)), but rare microburrows can be recognised in micro-CT images[@Zuchuat]. 
 
-In the nearby Lusitaniadalen section, which is approximately 4.5$\,$km northwest of Deltadalen and records the same lithological succession, a similar ichnofaunal record is recorded. The glauconitic sandstones of the Kapp Starostin and Vikinghøgda formations are completely bioturbated (ii5), and the discrete trace preserved in full relief includes large *Thalassinoides*, *Arenicolites*, *Palaeophycus* and *Skolithos*[@Nabbefeld2010a]. The overlying post-extinction mudstones are mostly not bioturbated (ii1), but a few thin horizons are recorded as being disturbed by isolated traces (ii2)[@Foster2017]. Approximately 8.5$\,$m above the extinction horizon, there is a thin, fine sandstone bed that records small *Planolites*, *Thalassinoides*, *Arenicolites*, and cf. *Lockeia* as convex hyporeliefs. The subsequent sandstones of the Vikinghøgda Formation, which become more abundant up section, are also characterised by similar trace fossils, but also includes *Diplocraterion*, *Arenicolites* and *Skolithos* in full relief, and can be up to 50% disturbed by bioturbation (ii2 to ii4). Furthermore, in the Kapp Starostin Formation below the glauconitic sandstones (from 15$\,$m below the extinction horizon) the succession is characterised by alternations of completely homogenised carbonate mudstone (ii6) overprinted by some discrete trace fossils disturbing between 10 and 50% of the sediment (ii3-4). These discrete trace fossils include *Zoophycos* and cf. *Taenidium* with regularly spaced meniscate backfills, preserved in full relief. These carbonate mudstones alternate with mudstone beds devoid of carbonate, but are between 40 to 80% bioturbated (ii4-5).
+In the nearby Lusitaniadalen section, which is approximately 4.5$\,$km northwest of Deltadalen and records the same lithological succession, a similar ichnofaunal record is recorded. The glauconitic sandstones of the Kapp Starostin and Vikinghøgda formations are completely bioturbated (ii5), and the discrete trace preserved in full relief includes large *Thalassinoides*, *Arenicolites*, *Palaeophycus* and *Skolithos*[@Nabbefeld2010]. The overlying post-extinction mudstones are mostly not bioturbated (ii1), but a few thin horizons are recorded as being disturbed by isolated traces (ii2)[@Foster2017]. Approximately 8.5$\,$m above the extinction horizon, there is a thin, fine sandstone bed that records small *Planolites*, *Thalassinoides*, *Arenicolites*, and cf. *Lockeia* as convex hyporeliefs. The subsequent sandstones of the Vikinghøgda Formation, which become more abundant up section, are also characterised by similar trace fossils, but also includes *Diplocraterion*, *Arenicolites* and *Skolithos* in full relief, and can be up to 50% disturbed by bioturbation (ii2 to ii4). Furthermore, in the Kapp Starostin Formation below the glauconitic sandstones (from 15$\,$m below the extinction horizon) the succession is characterised by alternations of completely homogenised carbonate mudstone (ii6) overprinted by some discrete trace fossils disturbing between 10 and 50% of the sediment (ii3-4). These discrete trace fossils include *Zoophycos* and cf. *Taenidium* with regularly spaced meniscate backfills, preserved in full relief. These carbonate mudstones alternate with mudstone beds devoid of carbonate, but are between 40 to 80% bioturbated (ii4-5).
 
 **Festningen**. At the Kapp Starostin Formation of Festningen, no primary sedimentary structures remain, and discrete trace fossils are visible at numerous levels, resulting in an ichnofabric index (ii) value of 5 (with the exception of bed Fe 68b = ii4)(Supplementary Fig. (\@ref(fig:FigLithostrat))). Many levels are so thoroughly bioturbated that individual trace fossils cannot be identified, but we recognize common *Zoophycos* (bed Fe 66-68a and 74-87) as well as *Chondrites*, *Thalassinoides* and *Helminthoidea*, which are preserved in full relief and sometimes pyritized. Diplocraterion can occasionally be seen in concretions. The basal two meters of the Vardebukta Formation contains horizontal, small (1$\,$mm), mud filled burrows (ii4). Laminated strata (ii1) begin at bed Fe 91. A thin, wave-rippled horizon at 92.2$\,$m contains small (1$\,$mm), mud-filled *Arenicolites* burrows (ii2), above which bioturbation is lacking (ii1) for the remainder of the sequence. Thus, the extinction horizon at Festningen is marked by the abrupt loss of large-scale burrows such as *Zoophycos* that are common in pre-extinction strata. In contrast to Deltadalen (but not dissimilar to the Lusitaniadalen section), small-scale burrowing continues in the basal meters of the post-extinction strata, before petering out a little below the P-T boundary.
 
@@ -1588,7 +1587,7 @@ plot.els$FeAl <- list(data.frame(section = c("Festningen", "Deltadalen")) %>%
                         reduce(. , bind_rows) %>% 
                         gather(. , "key", "value", -c(section, 
                                                       phase)) %>% 
-                        mutate(linetype = if_else(key == "mean", 1, 0.8)) %>% 
+                        mutate(alpha_f = if_else(key == "mean", 2, 1)) %>% 
              mutate(phase = factor(phase, levels = c("Fe[tot]/Al", "Fe[PRS]/Fe[tot]"), 
                             ordered = TRUE
                               )
@@ -1596,16 +1595,20 @@ plot.els$FeAl <- list(data.frame(section = c("Festningen", "Deltadalen")) %>%
 
 # relevant stratigraphic horizons for common plot
 # Festningen
-plot.els$PTX_hor_f <- list(geom_hline(yintercept = 3.87), geom_hline(yintercept = 0, linetype=2)) 
+plot.els$PTX_hor_f <- list(geom_hline(yintercept = 3.87, color = "darkgrey"), 
+                           geom_hline(yintercept = 0, linetype = 2, 
+                                      color = "darkgrey")) 
 # Deltadalen
-plot.els$PTX_hor_d <-list(geom_hline(yintercept = 86), geom_hline(yintercept = 87, linetype=2)) 
+plot.els$PTX_hor_d <-list(geom_hline(yintercept = 84, color = "darkgrey"), 
+                          geom_hline(yintercept = 87, linetype=2, 
+                                     color = "darkgrey")) 
 
 ```
 
 
 
 
-```{r FigDia, anchor="figure", fig.width = 8 , fig.height = 4 , fig.cap = "Stratigraphic plots of Fe~tot~/Al, Fe~PRS~/Fe~tot~ and P~tot~/Al of the Festningen site and Deltadalen core. The static boundaries for in the Fe~tot~/Al and P~tot~/Al plots represent the average shale values [@Wedepohl1990; @Clarkson2014]. On the Fe~PRS~/Fe~tot~ the dashed line represent the site-specific background values (Deltadalen: 0.13 ± 0.04  and Festningen: 0.19 ± 0.09)."}
+```{r FigDia, anchor="figure", fig.width = 8 , fig.height = 4 , fig.cap = "Stratigraphic plots of Fe~tot~/Al, Fe~PRS~/Fe~tot~ and P~tot~/Al of the Festningen site and Deltadalen core. The static boundaries for in the Fe~tot~/Al and P~tot~/Al plots represent the average shale values [@Wedepohl1991; @Clarkson2014]. On the Fe~PRS~/Fe~tot~ the dashed line represent the site-specific background values (Deltadalen: 0.13 ± 0.04  and Festningen: 0.19 ± 0.09)."}
 
 # data selection, ordering and labelling
 plot.1 <- all.CD.long %>% 
@@ -1638,18 +1641,19 @@ plot.1.f <- plot.1 %>%
               geom_blank(data = range.1 %>% filter(section == sec.select), 
                          aes(y = height, x = value))  
 
-plot.1.f_pr <- plot.1.f + 
+plot.1.f_pr <- plot.1.f +
+                plot.els$PTX_hor_f +
                 geom_vline(data = plot.els$FeAl %>% 
                              filter(section == sec.select),
                             aes(xintercept = value, color = phase, 
-                                alpha = linetype),
+                                alpha = alpha_f),
                            linetype = 3) +
+                scale_alpha(range = c(0.3, 1))+
                 geom_point() +
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
                 ggtitle(sec.select) +
-                plot.els$norm +
-                plot.els$PTX_hor_f 
+                plot.els$norm 
 
 
 plot.1.f_bl <- plot.1.f +
@@ -1667,19 +1671,20 @@ plot.1.d <- plot.1 %>%
               geom_blank(data = range.1 %>% filter(section == sec.select), 
                        aes(y = height, x = value)) 
 
-plot.1.d_pr <- plot.1.d + 
+plot.1.d_pr <- plot.1.d +
+                plot.els$PTX_hor_d +
                 geom_vline(data = plot.els$FeAl %>% 
                              filter(section == sec.select),
                            aes(xintercept = value, color = phase, 
-                               alpha = linetype),
+                               alpha = alpha_f),
                            linetype = 3) +
+                scale_alpha(range = c(0.3, 1))+
                 geom_point() +
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
                 ggtitle(sec.select) +
                 scale_y_reverse() +
-                plot.els$norm +
-                plot.els$PTX_hor_d 
+                plot.els$norm  
 
 
 plot.1.d_bl <- plot.1.d + 
@@ -1951,13 +1956,13 @@ plot.2.f <- plot.2 %>%
               geom_blank(data = range.2 %>% filter(section == sec.select), 
                          aes(y = height, x = value))  
 
-plot.2.f_pr <- plot.2.f + 
+plot.2.f_pr <- plot.2.f +
+                plot.els$PTX_hor_f + 
                 geom_point() +
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
                 ggtitle(sec.select) +
-                plot.els$norm +
-                plot.els$PTX_hor_f 
+                plot.els$norm 
 
 #Deltadalen                                                        
 sec.select <-  "Deltadalen" 
@@ -1967,14 +1972,14 @@ plot.2.d <- plot.2 %>%
               geom_blank(data = range.2 %>% filter(section == sec.select), 
                        aes(y = height, x = value)) 
 
-plot.2.d_pr <- plot.2.d + 
+plot.2.d_pr <- plot.2.d +
+                plot.els$PTX_hor_d + 
                 geom_point() +
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
                 ggtitle(sec.select) +
                 scale_y_reverse() +
-                plot.els$norm +
-                plot.els$PTX_hor_d 
+                plot.els$norm 
 
 # ensuring same sized plot heights
 fest <- cbind(pg.fest, ggplotGrob(plot.2.f_pr),  size = "first")
