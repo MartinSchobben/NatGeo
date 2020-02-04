@@ -467,10 +467,12 @@ plot.gl.d <- plot.els$glauc %>%
                                   lab.ev = "extrusive volcanism", ypos = 95) +
                 ggplot_grad_rects(45, 86, 100, -1, 0, "#d8b365", 
                                   sec = sec.select, 
-                                  lab.ev = "physical weathering/transport", ypos = 65) +
+                                  lab.ev = "physical weathering/transport", 
+                                  ypos = 65) +
                 ggplot_grad_rects(25, 89, 70, -1, 0, "#d8b365", 
                                   sec = sec.select, 
-                                  lab.ev = "physical weathering/transport", ypos = 95) +
+                                  lab.ev = "physical weathering/transport", 
+                                  ypos = 95) +
                 ggplot_grad_rects(45, 89, 100, -2.1, -1.1, "#5ab4ac", 
                                   sec = sec.select, 
                                   lab.ev = "chemical weathering", ypos = 65) +
@@ -576,17 +578,15 @@ MOU.df <- tibble(U_EF = seq(0.1, max.range, 0.1)) %>%
                      Mo_EF_0.1 = SW(U_EF) * 0.1) %>% 
               gather("key", "Mo_EF", -U_EF)
 
-MOE.text <- tibble(section = rep("b) Festningen (Distal)", 3),
+MOE.text <- tibble(section = rep("b) Festningen (distal)", 3),
                    labels = c(bquote("0.1"~Mo/U[sw]),
                               bquote(Mo/U[sw]),  
                               bquote("10"~Mo/U[sw])),
                    x.pos = c(10, 8, 1),
                    y.pos = c(5, 37, 43))
 
-
 plot.2.d <- plot.2 %>%
                 ggplot( . , aes(y = Mo_EF, x = U_EF)) 
-  
   
 plot.2.d_pr <- plot.2.d +
                 facet_grid(cols = vars(section)) +
@@ -762,7 +762,7 @@ plot.3.f_pr <- plot.3.f +
                 geom_point() +
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
-                ggtitle(paste(sec.select, "(Distal)", sep = " ")) +
+                ggtitle(paste(sec.select, "(distal)", sep = " ")) +
                 plot.els$norm +
                 theme(title = element_text(size = 8))
 
@@ -843,7 +843,7 @@ plot.3.d_pr <- plot.3.d +
                            color = "red")+
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
-                ggtitle(paste(sec.select, "(Proximal)", sep = " ")) +
+                ggtitle(paste(sec.select, "(proximal)", sep = " ")) +
                 scale_y_reverse() +
                 plot.els$norm +
                 theme(title = element_text(size = 8))

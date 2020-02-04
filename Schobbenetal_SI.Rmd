@@ -783,21 +783,71 @@ img <- readPNG(paste0(data.path, "data/Geograph/image_250.00Ma.png"))
 a <- rasterGrob(img)
 
 img <- readPNG(paste0(data.path, "data/Geograph/image_250.00Ma_Z.png"))
-b <- rasterGrob(img, width = unit(0.3, "npc"), x=  unit(0.85, "npc"), y=  unit(0.78, "npc"))
+b <- rasterGrob(img, width = unit(0.3, "npc"), 
+                x =  unit(0.85, "npc"), 
+                y =  unit(0.78, "npc"))
 
 # assign element to gtable
-rect.1  <-  grid.rect(width=unit(0.17, "npc"), height=unit(0.20,"npc"),  x=unit(0.5,"npc"), y=unit(0.66,"npc"), gp=gpar(fill=FALSE, col= "black", ltw=2), draw=FALSE) # black rect in main figure
-rect.2  <-  grid.rect(width=unit(0.295, "npc"), height=unit(0.41,"npc"),  x=unit(0.835,"npc"), y=unit(0.775,"npc"), gp=gpar(fill="white", col= "white", ltw=2), draw=FALSE) # white background of inset
-rect.3  <-  grid.rect(width=unit(0.298, "npc"), height=unit(0.38,"npc"),  x=unit(0.85,"npc"), y=unit(0.78,"npc"), gp=gpar(fill=FALSE, col= "black", ltw=3), draw=FALSE) # black rect around inset
+rect.1  <-  grid.rect(width = unit(0.17, "npc"), 
+                      height = unit(0.20, "npc"),  
+                      x = unit(0.5, "npc"), 
+                      y = unit(0.66, "npc"), 
+                      gp = gpar(fill = FALSE, col = "black", ltw = 2), 
+                      draw = FALSE) # black rect in main figure
+
+rect.2  <-  grid.rect(width = unit(0.295, "npc"), 
+                      height = unit(0.43, "npc"),  
+                      x = unit(0.835, "npc"), 
+                      y = unit(0.775, "npc"), 
+                      gp = gpar(fill = "white", col = "white", ltw = 2), 
+                      draw = FALSE) # white background of inset
+
+rect.3  <-  grid.rect(width = unit(0.298, "npc"), 
+                      height = unit(0.38, "npc"),  
+                      x = unit(0.85, "npc"), 
+                      y = unit(0.78, "npc"), 
+                      gp = gpar(fill = FALSE, col = "black", ltw = 3), 
+                      draw = FALSE) # black rect around inset
 
 # creating elements and text to be drawn on map
-text.1  <-  grid.text(label= "Panthalassa",  x=unit(0.26,"npc"), y=unit(0.7,"npc"), gp=gpar(fontsize=7), draw=FALSE)
-text.2  <-  grid.text(label= "Pangaea",  x=unit(0.95,"npc"), y=unit(0.79,"npc"), rot= 25, gp=gpar(fontsize=7), draw=FALSE)
-text.3  <-  grid.text(label= "Barents \n Sea",  x=unit(0.885,"npc"), y=unit(0.845 ,"npc"), rot= -15, gp=gpar(fontsize=5), draw=FALSE)
-text.4  <-  grid.text(label= "Sverdrup \n Basin",  x=unit(0.81,"npc"), y=unit(0.83,"npc"), rot=-25, gp=gpar(fontsize=5), draw=FALSE)
-text.5  <-  grid.text(label= "Siberian Traps",  x=unit(0.9,"npc"), y=unit(0.94 ,"npc"), rot= 15, gp=gpar(fontsize=5), draw=FALSE)
-text.6  <-  grid.text(label= "Permian–Triassic (251.9 Mya)",  x=unit(0.2,"npc"), y=unit(0.94 ,"npc"),  gp=gpar(fontsize=7), draw=FALSE)
-circ.1 <-  grid.circle(r=unit(0.012, "npc"), x=unit(0.855,"npc"), y=unit(0.805,"npc"), gp=gpar(fill=FALSE, col= "black", ltw=2), draw=FALSE)
+text.1  <-  grid.text(label = "Panthalassa",  
+                      x = unit(0.26, "npc"), 
+                      y = unit(0.7, "npc"), 
+                      gp = gpar(fontsize = 7), 
+                      draw = FALSE)
+text.2  <-  grid.text(label = "Pangaea",  
+                      x = unit(0.95, "npc"), 
+                      y = unit(0.79, "npc"), 
+                      rot = 25, 
+                      gp = gpar(fontsize = 7), draw = FALSE)
+text.3  <-  grid.text(label = "Barents \n Sea",  
+                      x = unit(0.885, "npc"), 
+                      y = unit(0.845 , "npc"), 
+                      rot = -15, 
+                      gp = gpar(fontsize = 5), 
+                      draw = FALSE)
+text.4  <-  grid.text(label = "Sverdrup \n Basin",  
+                      x= unit(0.81, "npc"), 
+                      y=unit(0.83, "npc"), 
+                      rot = -25, 
+                      gp = gpar(fontsize = 5), 
+                      draw = FALSE)
+text.5  <-  grid.text(label = "Siberian Traps",  
+                      x = unit(0.9, "npc"), 
+                      y = unit(0.94, "npc"), 
+                      rot = 15, 
+                      gp = gpar(fontsize = 5), 
+                      draw = FALSE)
+text.6  <-  grid.text(label= "Permian–Triassic (251.9 Mya)",  
+                      x = unit(0.2, "npc"), 
+                      y = unit(0.94, "npc"),  
+                      gp = gpar(fontsize = 7), 
+                      draw = FALSE)
+circ.1 <-  grid.circle(r = unit(0.012, "npc"), 
+                       x = unit(0.855, "npc"), 
+                       y = unit(0.805,"npc"), 
+                       gp = gpar(fill = FALSE, col = "black", ltw = 2), 
+                       draw = FALSE)
 
 gg <- gtable_add_grob(gg, a, 1, 1, z=1, name="a")
 gg <- gtable_add_grob(gg, rect.1, 1, 1, z=2, name="a.lab.rec")
