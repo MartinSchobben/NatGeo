@@ -9,7 +9,7 @@ output:
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
 subtitle: "Supplementary Information file"
 author: 
-- Martin Schobben^[School of Earth and Environment, University of Leeds, Woodhouse Lane, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, Invalidenstr. 43, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G.Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, The Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
+- Martin Schobben^[School of Earth and Environment, University of Leeds, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G.Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, The Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
 bibliography: biblio.bib
 ---
 
@@ -867,7 +867,7 @@ gg <- gtable_add_grob(gg, text.6, 1, 1, z=Inf, name="PTr")
 grid.draw(gg)
 
 # save plots external
-ggsave(paste0(data.path, "figures/SuppFig2.tiff"), gg )
+ggsave(paste0(data.path, "figures/SuppFig2.tiff"), gg)
 
 ```
 
@@ -1522,44 +1522,6 @@ Benthic macrofaunal communities were investigated at both Festningen and Deltada
 
 Within this fauna there are a large proportion of larval shells, which reveal the ontogenetic development of the recorded species. The larval stages were studied using an SEM [Ref @Foster2017] and for many of the bivalve species it was observed that they had a small prodissoconch I and a relatively large prodissoconch II (Fig. \@ref(fig:FigFos)B), which indicates a planktotrophic larval stage[@Hautmann2005]. In addition, some of the dominant gastropod larvae, *Warthia* and *Pseudozygolpleuridae*, have also been described as having planktotrophic larvae[@Fryda1999; @Mapes2009]. Extant inarticulate brachiopods, such as *Lingula*, are also observed to have planktotrophic larvae[@Yatsu1902; @Ashworth1915], which are morphologically similar to modern plantktotrophic inarticulate brachiopods *Lingula anatina* and *Discinisca* (Fig. \@ref(fig:FigFos)B). 
 
-```{r eval=FALSE}
-
-#----------------------------------------------------------------------------------------
-# Selection of SEM images
-#----------------------------------------------------------------------------------------
-
-# save images
-tiff(paste0(data.path, "report/spitsbergen/figures/SuppFig5.tiff"), height=20, width=10, unit="cm", res=300)
-
-# create gtable
-tg <- arrangeGrob(grobs=replicate(2, rectGrob(gp=gpar(col="white", fill="white")), FALSE))
-
-img <- readPNG(paste0(data.path, "data/paleontology/larval_shell.png"))
-a <- rasterGrob(img)
-
-img <- readPNG(paste0(data.path, "data/paleontology/Nucinella.png"))
-b <- rasterGrob(img)
-
-# assign element to gtable
-rect.1  <-  grid.rect(width=unit(0.07, "npc"), height=unit(0.07,"npc"),  x=unit(0.1,"npc"), y=unit(0.78,"npc"), gp=gpar(fill="white", col= "white"), draw=FALSE)
-text.1  <-  grid.text(label= "A",  x=unit(0.1,"npc"), y=unit(0.78,"npc"), gp=gpar(fontsize=7))
-text.2  <-  grid.text(label= "B",  x=unit(0.1,"npc"), y=unit(0.78,"npc"), gp=gpar(fontsize=7))
-
-tg <- gtable_add_grob(tg, a, 1, 1, z=Inf, name="a")
-tg <- gtable_add_grob(tg, b, 2, 1, z=Inf, name="b")
-
-tg <- gtable_add_grob(tg, rect.1, 1, 1, z=Inf, name="a.lab.rec")
-tg <- gtable_add_grob(tg, rect.1, 2, 1, z=Inf, name="b.lab.rec")
-
-tg <- gtable_add_grob(tg, text.1, 1, 1, z=Inf, name="a.lab")
-tg <- gtable_add_grob(tg, text.2, 2, 1, z=Inf, name="b.lab")
-
-# draw figures with additional elements
-grid.draw(tg)
-
-dev.off()
-
-```
 
 ```{r FigFos, fig.cap="Early stage larval shell development of A) the brachiopod *Lingularia*, B) zoomed in on the initial shell formation stages, and C) *Nucinella taylori*, collected from a concretion at 12.6$\\,$m above the base of the Vikinghogda Formation. The red outline indicates prodissoconch I and the green outline indicates prodissoconch II.", out.height="150%"}
 
@@ -1598,10 +1560,14 @@ Although the ‘poorly reactive sheet silicate Fe’ (Fe~PRS~) is generally of l
 
 # global theme settings
 theme_set(theme_classic())
-theme_replace(plot.background   = element_rect(fill = "transparent", color = NA),
-              panel.background  = element_rect(fill = "transparent", color = NA),
-              legend.background = element_rect(fill = "transparent", color = NA),
-              strip.background = element_rect(color = NA, fill = "transparent"),
+theme_replace(plot.background   = element_rect(fill = "transparent", 
+                                               color = NA),
+              panel.background  = element_rect(fill = "transparent", 
+                                               color = NA),
+              legend.background = element_rect(fill = "transparent", 
+                                               color = NA),
+              strip.background = element_rect(color = NA, 
+                                              fill = "transparent"),
               strip.placement = "outside")
 
 
@@ -1655,7 +1621,8 @@ plot.els$FeAl <- list(data.frame(section = c("Festningen", "Deltadalen")) %>%
                         gather(. , "key", "value", -c(section, 
                                                       phase)) %>% 
                         mutate(alpha_f = if_else(key == "mean", 2, 1)) %>% 
-             mutate(phase = factor(phase, levels = c("Fe[tot]/Al", "Fe[PRS]/Fe[tot]"), 
+             mutate(phase = factor(phase, levels = c("Fe[tot]/Al", 
+                                                     "Fe[PRS]/Fe[tot]"), 
                             ordered = TRUE
                               )
                  )
@@ -1685,7 +1652,8 @@ plot.1 <- all.CD.long %>%
                                   phase ==  "PRS_FeT" ~ "Fe[PRS]/Fe[tot]",
                                   phase ==  "DET_P" ~ "P[det]/P[tot]"
                                      ),
-                             levels = c("Fe[tot]/Al", "Fe[PRS]/Fe[tot]", "P[det]/P[tot]"), 
+                             levels = c("Fe[tot]/Al", "Fe[PRS]/Fe[tot]", 
+                                        "P[det]/P[tot]"), 
                              ordered = TRUE
                               )
                  )
@@ -1837,10 +1805,8 @@ for(i in seq_along(unique.types)){
 
 }
 
-
 # add lithological column
 img <- readPNG(paste0(data.path, "/data/litho/Festningen_litho_simple.png"))
-
 
 Fest_lith <- rasterGrob(img, height = unit(1,"npc"), width= unit(2,"npc"),  
                         x=unit(0,"npc"))
@@ -1860,7 +1826,6 @@ for(i in i.axis){
 
 # Deltadalen
 # geochronology 
-#setwd(paste(path, "/data/litho", sep=""))
 BB_chron <- read.csv(paste0(data.path, "/data/litho/Deltadalen_strat.csv"))
 
 pg <- ggplotGrob(plot.1.d_bl)
@@ -1881,21 +1846,13 @@ plot.els$y.range.d <-  y.range
 # filter to only use stratigraphic bounds contained within the plot
 
 filter.BB_chron <- BB_chron %>% 
-
   mutate(type = factor(type, levels = c("Period", "Formation"))) %>%
-
   filter(top <= max(y.range), bottom >= min(y.range)) %>%
-  
   rowwise() %>%
-  
   mutate(bottom = min(bottom, max(y.range)), top = max(top, min(y.range))) %>%
-  
   ungroup() %>%
-  
-  mutate(height = (bottom-top) / (max(bottom)- min(top))) %>%
-
+  mutate(height = (bottom - top) / (max(bottom) - min(top))) %>%
   select(name, type, R, G, B, height) %>%
-  
   arrange(type)
 
 unique.types <- unique(filter.BB_chron$type) %>% as.character()
@@ -2004,7 +1961,8 @@ plot.2 <- all.CD.long %>%
                               )
                  )
 
-# range set by geom blank to create equal x ranges for facets from different sections          
+# range set by geom blank to create equal x ranges for facets from different 
+# sections          
 range.2 <- plot.2 %>% 
            group_by(phase) %>% 
            mutate(value = max(value, na.rm = TRUE)) %>% 
