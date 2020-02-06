@@ -113,8 +113,8 @@ all.Fe <- map_df(ls.Fe %>% set_names(), ~read.csv(file =
                                                           "data/Fe_seq/", .x),
                                                   stringsAsFactors = FALSE),
                  .id = "path") %>%
-          as_tibble () %>%
-          filter_at(vars(ID), any_vars(str_detect(., pattern = "MS"))) %>%
+          filter(str_detect(ID, "MS")) %>%
+          #filter_at(vars(ID), any_vars(str_detect(., pattern = "MS"))) %>%
           mutate(phase=factor(
                           case_when(
                             str_detect(path, pattern = "AmOx") ~ "Fe_mag",
@@ -435,7 +435,10 @@ d34S_fest <- d34S_fest %>%
 sum_stat_d34S <- d34S_fest %>% filter(section == "standard") %>% 
                  group_by(Name) %>% 
                  summarize(mean = mean(S34), sd = sd(S34), n=n()) %>% 
-                 mutate(assigned=c(ls.Chem$as_CP1,NA,ls.Chem$as_S3, ls.Chem$as_sws)) %>% 
+                 mutate(assigned=c(ls.Chem$as_CP1,
+                                   NA,
+                                   ls.Chem$as_S3, 
+                                   ls.Chem$as_sws)) %>% 
                  column_to_rownames(var = "Name") %>% 
                  mutate_if(is.numeric, round, digits = 1)
 
@@ -723,7 +726,7 @@ dev.off()
 ```
 
 
-```{r FigGeograph,  anchor="figure", fig.cap = "Geographical setting of the Festningen section (1) and Deltadalen core (2). Lithofacies of Spitsbergen after ref @Harland1997. Map from DIVA-GIS[@Hijmans2004]"}
+```{r FigGeograph,  anchor="figure", fig.cap = "Geographical setting of the Festningen section (1) and Deltadalen core (2). Lithofacies of Spitsbergen after ref @Harland1997. Base map from GADM database (<https://gadm.org/>)"}
 
 knitr::include_graphics('figures/SuppFig1.png')
 
@@ -744,7 +747,7 @@ LIP <- readOGR(paste0(
 LIP <-subset(LIP, NAME ==  "SIBERIAN TRAPS, EXTRUSIVE VOLCANICS")
 
 # creating modified LIP shapefile
-dir.create("LIPs")
+dir.create("data/Geograph/LIPs")
 writeOGR(obj = LIP, dsn = "LIPs", layer = "newLIP", driver = "ESRI Shapefile")
 
 # defining a location ordinary matrix for the locations
@@ -923,20 +926,20 @@ all.CD.wide <- all.CD.long %>%
                ungroup()
 
 
-#=====================================================
+#===============================================================================
 # complete datasets for publication
-#=====================================================
+#===============================================================================
 
-good <-c(section.ID = "section ID", section = "section", height = "height (m)", 
-         P = "P[tot](wt. %)", Al = "Al[tot](wt. %)", Fe = "Fe[tot](wt. %)", 
-         Mo = "Mo[tot](µg/g)", Re = "Re[tot](ng/g)", 
-         U = "U[tot](µg/g)", Fe_carb = "Fe[carb](wt. %)", 
-         Fe_ox = "Fe[ox](wt. %)",  Fe_mag = "Fe[mag](wt. %)", 
-         Fe_py = "Fe[py](wt. %)", Fe_PRS = "Fe[PR](wt. %)", 
-         P_ox1 = "P[ox1](wt. %)", P_ox2 = "P[ox2](wt. %)", 
-         P_aut = "P[aut](wt. %)", P_det = "P[det](wt. %)", 
-         P_mag = "P[mag](wt. %)", P_org = "P[org](wt. %)",
-         TOC = "TOC(wt. %)", d13C = "δ13C[TOC]", d34S = "δ34S[py]")  
+good <- c(section.ID = "section ID", section = "section", height = "height (m)", 
+          P = "P[tot](wt. %)", Al = "Al[tot](wt. %)", Fe = "Fe[tot](wt. %)", 
+          Mo = "Mo[tot](µg/g)", Re = "Re[tot](ng/g)", 
+          U = "U[tot](µg/g)", Fe_carb = "Fe[carb](wt. %)", 
+          Fe_ox = "Fe[ox](wt. %)",  Fe_mag = "Fe[mag](wt. %)", 
+          Fe_py = "Fe[py](wt. %)", Fe_PRS = "Fe[PR](wt. %)", 
+          P_ox1 = "P[ox1](wt. %)", P_ox2 = "P[ox2](wt. %)", 
+          P_aut = "P[aut](wt. %)", P_det = "P[det](wt. %)", 
+          P_mag = "P[mag](wt. %)", P_org = "P[org](wt. %)",
+          TOC = "TOC(wt. %)", d13C = "δ13C[TOC]", d34S = "δ34S[py]")  
 
 # save all the different files for each of the sections
 df.extr <- all.CD.wide  %>%  
@@ -981,7 +984,6 @@ fl.create <-function(df, name){
 
 walk2(df.extr %>% pull(data) , df.extr %>% pull(section), fl.create)            
 
-
 #---------------------------------
 # Standards totals
 #---------------------------------
@@ -997,23 +999,23 @@ good <- good[names(good) %in% colnames(all.QC.wide)]
 
 # rename columns  
 all.QC.wide <- all.QC.wide %>% 
-               select(method, one_of(names(good))) %>% 
-               rename_at(vars(names(good)), ~ good) %>% 
+                select(method, one_of(names(good))) %>% 
+                rename_at(vars(names(good)), ~ good) %>% 
 # round to appropriate decimal for different measurements
-           mutate_at(vars(one_of(c("P[ox1](wt. %)", "P[ox2](wt. %)",
+                mutate_at(vars(one_of(c("P[ox1](wt. %)", "P[ox2](wt. %)",
                                    "P[aut](wt. %)", "P[det](wt. %)", 
                                    "P[mag](wt. %)", "P[org](wt. %)"))), 
-                     ~(sprintf("%.4f", . ))) %>% 
-           mutate_at(vars(one_of(c("Fe[carb](wt. %)", "Fe[ox](wt. %)", 
+                          ~(sprintf("%.4f", . ))) %>% 
+                mutate_at(vars(one_of(c("Fe[carb](wt. %)", "Fe[ox](wt. %)", 
                                    "Fe[mag](wt. %)",  
                                    "Fe[PR](wt. %)"))), 
-                     ~(sprintf("%.3f", . ))) %>% 
-           mutate_at(vars(one_of(c("P[tot](wt. %)", 
+                          ~(sprintf("%.3f", . ))) %>% 
+                mutate_at(vars(one_of(c("P[tot](wt. %)", 
                                    "Al[tot](wt. %)", "Fe[tot](wt. %)", 
                                    "Mo[tot](µg/g)", "Re[tot](ng/g)" , 
                                    "U[tot](µg/g)"))), 
-                     ~(sprintf("%.2f", . ))) %>% 
-           nest() 
+                           ~(sprintf("%.2f", . ))) %>% 
+                nest() 
               
 walk2(all.QC.wide %>% pull(data) , all.QC.wide %>% pull(method), fl.create)   
 
@@ -1190,22 +1192,22 @@ ls.Chem$corr_Alox <- with(atomicweight, (Al * 2 /(Al * 2 + O * 3)))
 
 # USGS reference values
 # SBC-1
-ls.Chem$SBC <- data.frame(phase = c("Fe", "P", "Al", "Mo", "U"),
-                          assigned = c(9.71 * ls.Chem$corr_Feox,
-                                       0.37 * ls.Chem$corr_Pox,
-                                       21 * ls.Chem$corr_Alox,
-                                       2.4, 5.76)) %>% 
-                          as_tibble() %>% 
-                          mutate(name = "SBC-1")
+ls.Chem$SBC <- tibble(phase = c("Fe", "P", "Al", "Mo", "U"),
+                      assigned = c(9.71 * ls.Chem$corr_Feox,
+                                   0.37 * ls.Chem$corr_Pox,
+                                   21 * ls.Chem$corr_Alox,
+                                   2.4, 
+                                   5.76),
+                      name = "SBC-1") 
 
 #SGR-1 Potsdam Georem
-ls.Chem$SGR <- data.frame(phase = c("Fe", "P", "Al", "Mo", "U"),
-                          assigned = c(3.03 * ls.Chem$corr_Feox,
-                                       0.328 * ls.Chem$corr_Pox,
-                                       6.52 * ls.Chem$corr_Alox,
-                                       35, 4.7)) %>% 
-                          as_tibble() %>% 
-                          mutate(name = "SGR 1b")
+ls.Chem$SGR <- tibble(phase = c("Fe", "P", "Al", "Mo", "U"),
+                      assigned = c(3.03 * ls.Chem$corr_Feox,
+                                   0.328 * ls.Chem$corr_Pox,
+                                   6.52 * ls.Chem$corr_Alox,
+                                   35, 
+                                   4.7),
+                      name = "SGR 1b") 
 
 #---------------------------
 # external reproducibility
@@ -1229,8 +1231,7 @@ sum.QC.Fe <- all.QC %>%
           ungroup() %>% 
           filter(mean > 0.01) %>%
           arrange(match(phase, c("Fe_carb", "Fe_ox", "Fe_mag", "Fe_PRS"))) %>% 
-          mutate(phase = recode(phase, !!!good)) %>% 
-          #mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
+          mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
           rename(name = section.ID)
 
 # summary statistics external standards P spec         
@@ -1248,7 +1249,6 @@ sum.QC.P <- all.QC %>%
           ungroup() %>% 
           filter(mean > 0.002) %>% 
           arrange(match(phase, c("P_aut", "P_ox2", "P_det", "P_org"))) %>% 
-          # mutate(phase = recode(phase, !!!good)) %>% 
           mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
           rename(name = section.ID)
   
@@ -1269,8 +1269,6 @@ sum.QC.TD <- all.QC %>%
           left_join(ls.Chem$SGR, by = c("phase", "name")) %>% 
           mutate(assigned = coalesce(assigned.x, assigned.y)) %>% 
           select(-c(assigned.x, assigned.y)) %>% 
-          # mutate(phase = recode(phase, !!!good)) %>% 
-           
           mutate(phase = factor(phase, levels =c("Al", "Fe", "P", "Mo", 
                                                  "U", "Re"),
                                 c("Al", "Fe~tot~", "P~tot~", "Mo*", "U*", 
@@ -1297,7 +1295,7 @@ Samples splits of ~100$\,$mg were fully digested with a combination of 5$\,$ml H
 #-------------------------------------------------------------------------------
 
 knitr::kable(sum.QC.TD, digits = 2, row.names = FALSE,  format = "pandoc",
-  caption = "Summary statistics certified USGS reference material SBC-1 and SGR 1 for major and minor  elements, respectively. Mean, SD and published values are in wt. %, except for elements labelled with an \\*, which are given in $\\mu$g/g, and and \\**, which are given in ng/g")
+  caption = "Summary statistics certified USGS reference material SBC-1 and SGR 1 for major and minor  elements, respectively. Mean, SD and published values are in wt. %, except for elements labelled with an \\*, which are given in $\\mu$g/g, and \\**, which are given in ng/g")
 
 ```
 
@@ -1425,7 +1423,7 @@ knitr::kable(sum_stat_d34S, digits = 1, booktabs = TRUE,
 
 ## Carbon and sulfur isotope analysis
   Carbonate was removed from the powdered rock samples by dissolution with 2 M HCl. The residues were repeatedly washed with MilliQ water^TM^and dried at 40$\,$°C. The de-carbonated samples were then analyzed for total organic carbon (TOC = C~org~) content and associated carbon isotopic composition using an Elementar Pyrocube elemental analyser linked to an Isoprime mass spectrometer.
-  The acid washed sample powder was weighed into a tin capsule and combusted at 1150$\,$°C in the presence of pure oxygen (N5.0) injected into a stream of helium (CP grade). Complete oxidation of resulting gases was achieved by passing them through tungstic oxide heated to 1150$\,$°C. Water and excess oxygen were removed from the gas stream by Sicapent and fine copper wires heated to 850$\,$°C respectively. N~2~ passes through the system unchecked, whilst CO~2~ and SO~2~ are removed and reinjected into the gas stream using temperature controlled adsorption-desorption columns. The $\delta$^13^C~org~ of the sample is calculated from the integrated mass 44, 45 and 46 signals from the pulse of sample CO~2~ compared to that of an independently introduced pulse of reference gas (CP grade). Carbon isotope analyses were calibrated with in-house C4-sucrose and urea standards assigned values of -11.93$\,$‰ and -46.83$\,$‰ respectively via calibration with the international standards (assigned values with respect to VPDB in brackets), LSVEC (-46.48$\,$‰), CH7 (-31.83$\,$‰), CH6 (-10.45$\,$‰), and CO-1 (+2.48$\,$‰).The analytical precision of the carbon isotope measurements was checked with a C-3 internal lab standard and yielded a value of 0.05$\,$‰ (2 SD). TOC values were derived from the combined area of all three mass traces and calibrated using the known weight$\,$% C of of the C4 sucrose standard. The reproducibility of these analyses with similar samples from previous runs gives RSDs for in-house standard materials of ~10$\,$%. TOC values were corrected for weight-loss during acid digestion.
+  The acid washed sample powder was weighed into a tin capsule and combusted at 1150$\,$°C in the presence of pure oxygen (N5.0) injected into a stream of helium (CP grade). Complete oxidation of resulting gases was achieved by passing them through tungstic oxide heated to 1150$\,$°C. Water and excess oxygen were removed from the gas stream by Sicapent and fine copper wires heated to 850$\,$°C respectively. N~2~ passes through the system unchecked, whilst CO~2~ and SO~2~ are removed and reinjected into the gas stream using temperature controlled adsorption-desorption columns. The $\delta$^13^C~org~ of the sample is calculated from the integrated mass 44, 45 and 46 signals from the pulse of sample CO~2~ compared to that of an independently introduced pulse of reference gas (CP grade). Carbon isotope analyses were calibrated with in-house C4-sucrose and urea standards assigned values of -11.93$\,$‰ and -46.83$\,$‰ respectively via calibration with the international standards (assigned values with respect to VPDB in brackets), LSVEC (-46.48$\,$‰), CH7 (-31.83$\,$‰), CH6 (-10.45$\,$‰), and CO-1 (+2.48$\,$‰).The analytical precision of the carbon isotope measurements was checked with a C-3 internal lab standard and yielded a value of 0.05$\,$‰ (2SD). TOC values were derived from the combined area of all three mass traces and calibrated using the known weight$\,$% C of of the C4 sucrose standard. The reproducibility of these analyses with similar samples from previous runs gives RSDs for in-house standard materials of ~10$\,$%. TOC values were corrected for weight-loss during acid digestion.
   The Pyrocube was configured in the same way as described above for carbon isotope analysis. The $\delta$^34^S was derived from the integrated mass 64 and 66 signals of the sample gas compared to a pulse of independently introduced reference gas, and was calibrated to the international V-CDT scale using an lab-internal barium sulfate standard derived from seawater (SWS-3) which has been analysed against the international standards (assigned VCDT value in brackets), NBS-127 (+20.30$\,$‰), NBS-123 (+17.01$\,$‰), IAEA S-1 (-0.30$\,$‰) and IAEA S-3 (-32.06$\,$‰). The analytical precision was checked with an internal suite of reference materials and barium sulfate standard and yielded a value of 0.9$\,$‰ (2SD) or better.
 
 ## Mineralogical analysis
