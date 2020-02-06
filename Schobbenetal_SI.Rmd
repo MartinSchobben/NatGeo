@@ -9,7 +9,7 @@ output:
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
 subtitle: "Supplementary Information file"
 author: 
-- Martin Schobben^[School of Earth and Environment, University of Leeds, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G.Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, The Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
+- Martin Schobben^[School of Earth and Environment, University of Leeds, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R.N. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G. Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
 bibliography: biblio.bib
 ---
 
