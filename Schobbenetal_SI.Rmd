@@ -114,8 +114,7 @@ all.Fe <- map_df(ls.Fe %>% set_names(), ~read.csv(file =
                                                   stringsAsFactors = FALSE),
                  .id = "path") %>%
           filter(str_detect(ID, "MS")) %>%
-          #filter_at(vars(ID), any_vars(str_detect(., pattern = "MS"))) %>%
-          mutate(phase=factor(
+          mutate(phase = factor(
                           case_when(
                             str_detect(path, pattern = "AmOx") ~ "Fe_mag",
                             str_detect(path, pattern = "CDA")  ~ "Fe_ox",
@@ -135,10 +134,10 @@ all.Fe.P <- all.Fe %>%
 
 # merge Fe spec data with sample IDs
 all.Fe <- all.Fe %>%
-          filter(method == "Fespec") %>%
-          left_join( . ,ID, by="ID") %>%
+           filter(method == "Fespec") %>%
+           left_join( . ,ID, by="ID") %>%
 # remove samples without section identifier
-          drop_na(section.ID)
+           drop_na(section.ID)
 
 #-------------------------------
 # loading CRS data
@@ -155,12 +154,12 @@ all.CRS <- map_df(ls.CRS %>% set_names(),
 #-------------------------------
 all.TD  <-list(
                read.csv(paste0(data.path, "data/totals/Total_Sum_ed.csv"), 
-                        stringsAsFactors=FALSE) %>%
+                        stringsAsFactors = FALSE) %>%
                   as_tibble() %>%
                   group_by(ID) %>%
                   mutate(newID = row_number()),
                read.csv(paste0(data.path, "data/totals/Total_Sum_TE_ed.csv"), 
-                        stringsAsFactors=FALSE) %>%
+                        stringsAsFactors = FALSE) %>%
                   as_tibble() %>%
                   group_by(ID) %>%
                   mutate(newID = row_number())) %>%
@@ -228,7 +227,6 @@ names(CBs_oct) <- ls.Clb[[4]]
 
 # complete list of calibration curves
 CBs.com <- flatten(list(CBs_dec, CBs_jan, CBs_march, CBs_oct))
-
 
 #-------------------------------
 # loading ICP P spec data
@@ -301,7 +299,6 @@ all.TOC <- all.TOC %>% mutate(value = ((1 - ((weight_tube_gram +
 #-------------------------------
 # loading d13C data
 #-------------------------------
-#setwd(paste(path, "data/Cisotope", sep=""))
 all.d13C   <- read.csv(paste0(data.path, "data/Cisotope/d13C_march2018_ed.csv"),
                        stringsAsFactors=FALSE) %>%
                         as_tibble() %>%
@@ -327,7 +324,6 @@ sum_stat_d13C <- read.csv(paste0(data.path,
                           mutate_if(is.numeric, round, digits = 1)
 
 # loading d34S data
-# setwd(paste(path, "data/Sisotope", sep = ""))
 d34S_fest <- read.csv(paste0(data.path, "data/Sisotope/d34S_Fest.csv"),
                       stringsAsFactors = FALSE) %>% as_tibble()
 d34S_DD <- read.csv(paste0(data.path, "data/Sisotope/d34S_DD.csv"),
@@ -338,37 +334,41 @@ stringy<-function(x) {cm<-strsplit(x, split = "-")
             return(cm[[1]][2])}
 
 # reformatting raw data output (only Festningen)
-d34S_fest <- d34S_fest %>% select(SN = contains(".Number"),
-                                  Aq.T = contains("date"),
-                                  Name,
-                                  RT = contains("Sec"),
-                                  Amps = contains("..nA"),
-                                  S34
-                                  ) %>%
-                           rowwise() %>%
-                           mutate(Name = stringy(Name)) %>%
-                           mutate(section =
-                                    case_when(
-                                str_detect(Name, pattern = "Fe") ~ "sample",
-                                str_detect(Name, pattern = "blank") ~ "blank",
-                                str_detect(Name, pattern = "S3") ~ "standard",
-                                str_detect(Name, pattern = "CP") ~ "standard",
-                                str_detect(Name, pattern = "May") ~ "standard",
-                                str_detect(Name, pattern = "sws") ~ "standard"
-                                  )) %>%
-                           ungroup() %>%
-                           drop_na()
+d34S_fest <- d34S_fest %>% 
+               select(SN = contains(".Number"),
+                      Aq.T = contains("date"),
+                      Name,
+                      RT = contains("Sec"),
+                      Amps = contains("..nA"),
+                      S34) %>%
+               rowwise() %>%
+               mutate(Name = stringy(Name)) %>%
+               mutate(section =
+                        case_when(
+                                  str_detect(Name, pattern = "Fe") ~ "sample",
+                                  str_detect(Name, pattern = "blank") ~ "blank",
+                                  str_detect(Name, pattern = "S3") ~ "standard",
+                                  str_detect(Name, pattern = "CP") ~ "standard",
+                                  str_detect(Name, pattern = "May") ~ "standard",
+                                  str_detect(Name, pattern = "sws") ~ "standard"
+                                 )
+                      ) %>%
+                ungroup() %>%
+                drop_na()
                            
 # create labels for sampling blocks
- d34S_bl <-  d34S_fest %>% distinct(SN, .keep_all = TRUE) %>%
-                           filter(!section == "blank") %>%
-                           mutate(rn = row_number()) %>%
-                           group_by(section) %>%
-                           mutate(block = dense_rank(cumprod
-                                                     (rn - lag(rn,
-                                                           default =
+ d34S_bl <- d34S_fest %>% 
+              distinct(SN, .keep_all = TRUE) %>%
+              filter(!section == "blank") %>%
+              mutate(rn = row_number()) %>%
+              group_by(section) %>%
+              mutate(block = dense_rank(cumprod
+                                         (rn - lag(rn,
+                                                   default =
                                                              min(rn) - 1)))
-                                  ) %>% ungroup %>%  select(SN, block)
+                                  ) %>% 
+              ungroup %>%  
+              select(SN, block)
  
 # add sampling blocks to datafile
 d34S_fest <- left_join(d34S_fest, d34S_bl, by = "SN")
@@ -410,7 +410,7 @@ ls.Chem$S.c <- ls.Chem$Sref %>%
 # scale.checker(ls.Chem$S.c$scale.C)
 
 # calibration of S isotope values (only for Festningen)
-mod_fun <- function(df) {lm(real~S34, df)}
+mod_fun <- function(df) {lm(real ~ S34, df)}
 s_fun <- function(mod) {coefficients(mod)[[2]]}
 i_fun <- function(mod) {coefficients(mod)[[1]]} 
 
@@ -614,28 +614,31 @@ all.P <- all.P %>%
 # Total Digestion
 #===============================================================================
 # element of importance for this work
-TD.sc <- list(major = c("Fe", "Al", "P"), minor = c("Mo", "U"), ultra = "Re")
+TD.sc <- list(major = c("Fe", "Al", "P"), 
+              minor = c("Mo", "U"), 
+              ultra = "Re")
 
 # converting TD elements to rock sample concentration
 all.TD <- all.TD %>% 
-          select(one_of(c(gl.ID, "height", unlist(TD.sc), "weight_gram"))) %>% 
-          gather(key = "phase", value = "value", 
-                 -c(gl.ID, "weight_gram", "height")) %>% 
-          mutate(Output.unit = case_when(phase %in% TD.sc$major ~ "ppm",
+            select(one_of(c(gl.ID, "height", unlist(TD.sc), "weight_gram"))) %>% 
+            gather(key = "phase", value = "value", 
+                   -c(gl.ID, "weight_gram", "height")) %>% 
+            mutate(Output.unit = case_when(phase %in% TD.sc$major ~ "ppm",
                                   phase %in% TD.sc$minor ~ "ppb",
                                   phase %in% TD.sc$ultra ~ "ppt")) %>% 
-          rowwise() %>% 
+            rowwise() %>% 
 # calculating actual concentration,converting units to ppm for TE (ppb for Re)
-          mutate(value = case_when(Output.unit == "ppm"~ 
-                                   EWeight(value, Output.unit, 250, 
-                                           weight_gram),
-                                   Output.unit == "ppb" ~
-                                   EWeight(value, Output.unit, 250, 
-                                           weight_gram)*10^4,
-                                   Output.unit == "ppt" ~
-                                   EWeight(value, Output.unit, 250, 
-                                           weight_gram)*10^7
-                                  )) %>% 
+            mutate(value = case_when(Output.unit == "ppm"~ 
+                                     EWeight(value, Output.unit, 250, 
+                                             weight_gram),
+                                     Output.unit == "ppb" ~
+                                     EWeight(value, Output.unit, 250, 
+                                             weight_gram)*10^4,
+                                     Output.unit == "ppt" ~
+                                     EWeight(value, Output.unit, 250, 
+                                            weight_gram)*10^7
+                                    )
+                   ) %>% 
           ungroup() %>% 
           # actual units of element rock concentration
           mutate(unit = case_when(Output.unit == "ppm" ~ "%",
@@ -648,28 +651,27 @@ all.TD <- all.TD %>%
 wr.S <- c("MS_TD_65","MS_TD_66")
 
 all.TD <- all.TD %>%  
-          rowwise() %>% 
-          mutate(value = if_else(ID %in% wr.S, value * 2, value)) %>% 
-          ungroup()
+            rowwise() %>% 
+            mutate(value = if_else(ID %in% wr.S, value * 2, value)) %>% 
+            ungroup()
 
 # remove heigh and low initial weight standards for testing weight dependence
 all.TD <- all.TD %>% 
-          filter(!section == "Standard" && weight_gram < 0.15 && 
-                 weight_gram > 0.07) %>% 
-          select(-weight_gram)
+            filter(!section == "Standard" && weight_gram < 0.15 && 
+                   weight_gram > 0.07) %>% 
+            select(-weight_gram)
 
 #---------------------------
 # store QCs TD
 #---------------------------
 all.QC <- all.TD %>% 
-          filter(section == "Standard") %>% 
-          bind_rows( . , all.QC) 
+            filter(section == "Standard") %>% 
+            bind_rows( . , all.QC) 
 
 # remove QCs TD
 all.TD <- all.TD %>% 
-          filter(!section == "Standard" & !section == "blank") 
+            filter(!section == "Standard" & !section == "blank") 
                                  
-
 ```
 
 
@@ -681,7 +683,7 @@ The Svalbard island group is situated between 74 and 81$\,$°N on the northweste
 
 setwd(paste0(data.path, "data/Geograph"))
 
-shape2 <-readOGR(dsn=".", layer = "SJM_adm1") # loading shape file
+shape2 <-readOGR(dsn = ".", layer = "SJM_adm1") # loading shape file
 
 plot(shape2)
 
@@ -700,10 +702,14 @@ Fest.y <- 78.09 # latitude
 DD.x <- 16.88 # longitude
 DD.y <- 78.27 # latitude
 
-Loc.coord <- data.frame(name="Sites", x=c(Fest.x, DD.x), y=c(Fest.y, DD.y))
+Loc.coord <- data.frame(name = "Sites", 
+                        x = c(Fest.x, DD.x), 
+                        y = c(Fest.y, DD.y))
 coordinates(Loc.coord) <- c("x", "y")
+
 # mock CRS to override the NA 
 proj4string(Loc.coord) <- CRS("+proj=longlat +ellps=WGS84") 
+
 # transform coordinate system to fit map
 Loc.coord <- spTransform(Loc.coord, common.CRS2) 
 
@@ -913,17 +919,18 @@ all.CD.long <- list(all.TD,
                     all.d13C, 
                     all.d34S) %>% 
                       reduce(bind_rows) %>% 
-                      select(-height) %>% 
-                      left_join(all.TD %>% filter(phase == "Fe") %>%  
-                                           select(section.ID, height), 
-                                by = "section.ID") %>% 
-                      mutate(height = height/100)
+                        select(-height) %>% 
+                        left_join(all.TD %>% 
+                                    filter(phase == "Fe") %>%  
+                                    select(section.ID, height), 
+                                  by = "section.ID") %>% 
+                          mutate(height = height / 100)
                     
 all.CD.wide <- all.CD.long %>%   
-               select(-c(method, ID, unit)) %>% 
-               group_by(phase, section.ID) %>% 
-               spread(phase, value) %>% 
-               ungroup()
+                 select(-c(method, ID, unit)) %>% 
+                 group_by(phase, section.ID) %>% 
+                 spread(phase, value) %>% 
+                 ungroup()
 
 
 #===============================================================================
@@ -943,36 +950,38 @@ good <- c(section.ID = "section ID", section = "section", height = "height (m)",
 
 # save all the different files for each of the sections
 df.extr <- all.CD.wide  %>%  
-           filter(section != "Akkamori") %>% 
-           group_by(section) %>% 
-           arrange_at(vars(section, contains("height")), desc) %>% 
+             filter(section != "Akkamori") %>% 
+             group_by(section) %>% 
+             arrange_at(vars(section, contains("height")), desc) %>% 
 # rename columns  
-           select(one_of(names(good))) %>% 
-           rename_at(vars(names(good)), ~ good) %>% 
+             select(one_of(names(good))) %>% 
+             rename_at(vars(names(good)), ~ good) %>% 
 # round to appropriate decimal for different measurements
-           mutate_at(vars(one_of(c("P[ox1](wt. %)", "P[ox2](wt. %)",
-                                   "P[aut](wt. %)", "P[det](wt. %)", 
-                                   "P[mag](wt. %)", "P[org](wt. %)"))), 
-                     ~(sprintf("%.4f", . ))) %>% 
-           mutate_at(vars(one_of(c("Fe[carb](wt. %)", "Fe[ox](wt. %)", 
-                                   "Fe[mag](wt. %)", "Fe[py](wt. %)", 
-                                   "Fe[PR](wt. %)"))), 
-                     ~(sprintf("%.3f", . ))) %>% 
-           mutate_at(vars(one_of(c("height (m)", "P[tot](wt. %)", 
-                                   "Al[tot](wt. %)", "Fe[tot](wt. %)", 
-                                   "Mo[tot](µg/g)", "Re[tot](ng/g)" , 
-                                   "U[tot](µg/g)", "TOC(wt. %)"))), 
-                     ~(sprintf("%.2f", . ))) %>% 
-           mutate_at(vars(one_of(c("δ13C[TOC]", "δ34S[py]"))), 
-                     ~(sprintf("%.1f", . ))) %>% 
-           nest() 
+             mutate_at(vars(one_of(c("P[ox1](wt. %)", "P[ox2](wt. %)",
+                                     "P[aut](wt. %)", "P[det](wt. %)", 
+                                     "P[mag](wt. %)", "P[org](wt. %)"))), 
+                       ~(sprintf("%.4f", . ))) %>% 
+             mutate_at(vars(one_of(c("Fe[carb](wt. %)", "Fe[ox](wt. %)", 
+                                     "Fe[mag](wt. %)", "Fe[py](wt. %)", 
+                                     "Fe[PR](wt. %)"))), 
+                       ~(sprintf("%.3f", . ))) %>% 
+             mutate_at(vars(one_of(c("height (m)", "P[tot](wt. %)", 
+                                     "Al[tot](wt. %)", "Fe[tot](wt. %)", 
+                                     "Mo[tot](µg/g)", "Re[tot](ng/g)" , 
+                                     "U[tot](µg/g)", "TOC(wt. %)"))), 
+                       ~(sprintf("%.2f", . ))) %>% 
+             mutate_at(vars(one_of(c("δ13C[TOC]", "δ34S[py]"))), 
+                       ~(sprintf("%.1f", . ))) %>% 
+             nest() 
 
 # function to write files with accompanying filenames
 fl.create <-function(df, name){
                                 
-                               df <- df %>% drop_na()  
+                               df <- df %>% 
+                                      drop_na()  
                                fl.names <- paste(name,"csv", sep = ".")  
-                               write.table(x = df , file = 
+                               write.table(x = df , 
+                                           file = 
                                            paste0(data.path, 
                                              "datafiles/", 
                                                 fl.names) , 
@@ -981,20 +990,25 @@ fl.create <-function(df, name){
                                            fileEncoding = "UTF-8", 
                                            quote = FALSE)
                               }
-
-walk2(df.extr %>% pull(data) , df.extr %>% pull(section), fl.create)            
+# print data
+walk2(df.extr %>% 
+        pull(data) , 
+      df.extr %>% 
+        pull(section), 
+      fl.create)            
 
 #---------------------------------
 # Standards totals
 #---------------------------------
 
 all.QC.wide <- all.QC %>%   
-               select(-c(unit, path, section, height)) %>% 
-               group_by(phase, ID) %>% 
-               spread(phase, value) %>% 
-               group_by(method) %>% 
-               arrange_at(vars(method, ID), desc) 
+                 select(-c(unit, path, section, height)) %>% 
+                 group_by(phase, ID) %>% 
+                 spread(phase, value) %>% 
+                 group_by(method) %>% 
+                 arrange_at(vars(method, ID), desc) 
 
+# filter to contain only reported QC
 good <- good[names(good) %in% colnames(all.QC.wide)]
 
 # rename columns  
@@ -1017,7 +1031,12 @@ all.QC.wide <- all.QC.wide %>%
                            ~(sprintf("%.2f", . ))) %>% 
                 nest() 
               
-walk2(all.QC.wide %>% pull(data) , all.QC.wide %>% pull(method), fl.create)   
+# print QC data
+walk2(all.QC.wide %>% 
+        pull(data), 
+      all.QC.wide %>% 
+        pull(method), 
+      fl.create)   
 
 ```
 
@@ -1060,95 +1079,103 @@ all.CD.wide <- all.CD.wide %>%
 
 # background poorly reactive Fe levels
 plot.els$PRS_fest <- all.CD.wide  %>%  
-                     filter(section == "Festningen", height < 0 | 
-                            height > 2) %>% 
-                     summarise(avg = mean(PRS_FeT), sd = sd(PRS_FeT), 
-                               phase = "Fe[PRS]/Fe[tot]")
+                       filter(section == "Festningen", height < 0 | 
+                              height > 2) %>% 
+                       summarise(avg = mean(PRS_FeT), sd = sd(PRS_FeT), 
+                                 phase = "Fe[PRS]/Fe[tot]")
 
 plot.els$PRS_dd  <- all.CD.wide  %>%  
-                    filter(section=="Deltadalen",  height < 86) %>% 
-                    summarise(avg=mean(PRS_FeT), sd=sd(PRS_FeT), 
-                              phase = "Fe[PRS]/Fe[tot]")
+                      filter(section=="Deltadalen",  height < 86) %>% 
+                      summarise(avg=mean(PRS_FeT), sd=sd(PRS_FeT), 
+                                phase = "Fe[PRS]/Fe[tot]")
 
 # highly reactive Fe over total star 
 all.CD.wide <- all.CD.wide %>% 
-               rowwise() %>%  
-               mutate(Fe_HR_star = 
-                      HR_star(X = PRS_FeT, 
-                              FeT = Fe, 
-                              Fe_HR = Fe_HR, 
-                              base = ifelse(section == "Festningen", 
-                                       as.numeric(plot.els$PRS_fest$avg), 
-                                       as.numeric(plot.els$PRS_dd$avg)
-                                           )
-                              )
-                       ) %>% 
-                ungroup() %>%
+                 rowwise() %>%  
+                 mutate(Fe_HR_star = 
+                        HR_star(X = PRS_FeT, 
+                                FeT = Fe, 
+                                Fe_HR = Fe_HR, 
+                                base = ifelse(
+                                  section == "Festningen", 
+                                  as.numeric(plot.els$PRS_fest$avg), 
+                                  as.numeric(plot.els$PRS_dd$avg)
+                                             )
+                                )
+                         ) %>% 
+                 ungroup() %>%
 # highly reactive star over total
-                mutate(HR_FeT_star = Fe_HR_star / Fe, 
+                 mutate(HR_FeT_star = Fe_HR_star / Fe, 
 # pyrite-FE over highly reactive star  
-                Pyr_HR_star = Fe_py / Fe_HR_star)
+                        Pyr_HR_star = Fe_py / Fe_HR_star)
 
 #-------------------------------------------
 # P spec
 #-------------------------------------------
   
 all.CD.wide <- all.CD.wide %>%
-               mutate(P_Fe = P_ox1 + P_ox2 + P_mag,
+                 mutate(P_Fe = P_ox1 + P_ox2 + P_mag,
 # reactive P pool minimum                
-                      HRP_min = P_aut + P_Fe + P_org,                 
+                        HRP_min = P_aut + P_Fe + P_org,                 
 # reactive P pool maximum                     
-                      HRP_max = P_aut + P_Fe + P_org + P_det) %>%   
+                        HRP_max = P_aut + P_Fe + P_org + P_det) %>%   
 # reactive P over total minimum                      
-               mutate(HRP_P_min = HRP_min / P,
+                 mutate(HRP_P_min = HRP_min / P,
 # reactive P over total maxmimum                      
-                       HRP_P_max = HRP_max / P,
+                         HRP_P_max = HRP_max / P,
 # detrital P over total
-                       DET_P = P_det / P) %>% 
+                         DET_P = P_det / P) %>% 
 # molar Corg over Porg  
-               mutate(Corg_Porg  = ifelse(P_org > 0 ,
-                                          (TOC / atomicweight$C) / 
-                                            (P_org / atomicweight$P), NA),
+                 mutate(Corg_Porg  = 
+                          ifelse(P_org > 0 ,
+                                  (TOC / atomicweight$C) / 
+                                  (P_org / atomicweight$P), NA),
 # molar Corg over Preac                        
-                      Corg_Preac = ifelse(HRP_min > 0 ,
-                                          (TOC / atomicweight$C) / 
-                                            (HRP_min / atomicweight$P), NA)
-                      )
+                          Corg_Preac = 
+                           ifelse(HRP_min > 0 ,
+                                   (TOC / atomicweight$C) / 
+                                   (HRP_min / atomicweight$P), NA)
+                        )
+
 #-------------------------------------------
 # other elements
 #-------------------------------------------
   
 all.CD.wide <- all.CD.wide %>%
 # iron over aluminium
-               mutate(Fe_Al = Fe / Al,
+                 mutate(Fe_Al = Fe / Al,
 # phosphorus over aluminium                      
-                      P_Al = P / Al,
+                        P_Al = P / Al,
 # Mo over aluminium (ug/g)
-                      Mo_Al = (Mo / Al) * 100,
+                        Mo_Al = (Mo / Al) * 100,
 # U over aluminium  (ug/g)
-                      U_Al  = (U / Al) * 100,
+                        U_Al  = (U / Al) * 100,
 # Re over aluminium  (ng/g) 
-                      Re_Al = (Re / Al) * 100,
+                        Re_Al = (Re / Al) * 100,
 # Re over Mo
-                      Re_Mo = (Re / 1000) / Mo,
+                        Re_Mo = (Re / 1000) / Mo,
 # Mo over U 
-                      Mo_U  =  Mo / U)
+                        Mo_U  =  Mo / U)
 
 #-------------------------------------------
 # average shale element values (Wedepohl, 1971, 1991)
 #-------------------------------------------
 
-ls.Chem$PAAS <- data.frame(value = 
-                             c(0.15 * 100,   # Mo/Al average shale (ug/g)
-                               0.008,        # P/Al average shale (%g/%g) 
-                               0.42 * 100,   # U/Al average shale (ug/g)
-                               0.55,         # Fe/Al average shale (%g/%g)
-                               96 * 10^-4,   # Mn/Al average shale (%g/%g)
-                               0.11 * 1000), # Re/Al average shale (ng/g)
-                           phase = c("Mo_Al", "P_Al", "U_Al", "Fe[tot]/Al", 
-                                     "Mn_Al", "Re_Al")
-                            ) %>% 
-                        as_tibble()
+ls.Chem$PAAS <- tibble(value = 
+                               c(0.15 * 100,   # Mo/Al average shale (ug/g)
+                                 0.008,        # P/Al average shale (%g/%g) 
+                                 0.42 * 100,   # U/Al average shale (ug/g)
+                                 0.55,         # Fe/Al average shale (%g/%g)
+                                 96 * 10^-4,   # Mn/Al average shale (%g/%g)
+                                 0.11 * 1000), # Re/Al average shale (ng/g)
+                        phase = 
+                                c("Mo_Al", 
+                                  "P_Al", 
+                                  "U_Al", 
+                                  "Fe[tot]/Al", 
+                                  "Mn_Al", 
+                                  "Re_Al")
+                        ) 
 #-------------------------------------------
 # enrichment factors over average shale (EF_element X = 
 # X/Al_sample/X/Al_average-shale; Tribovillard et al., 2006)
@@ -1178,6 +1205,7 @@ all.CD.wide <- all.CD.wide %>%
 all.CD.long <- all.CD.wide %>% gather(key = phase, value = value, 
                                       -c(section, section.ID, height))
 
+# write file for consecutive processing in main Rmd file
 write.csv(all.CD.long, "all.CD.long.csv") 
 
 ```
@@ -1558,9 +1586,9 @@ Although the ‘poorly reactive sheet silicate Fe’ (Fe~PRS~) is generally of l
 
 # global theme settings
 theme_set(theme_classic())
-theme_replace(plot.background   = element_rect(fill = "transparent", 
+theme_replace(plot.background = element_rect(fill = "transparent", 
                                                color = NA),
-              panel.background  = element_rect(fill = "transparent", 
+              panel.background = element_rect(fill = "transparent", 
                                                color = NA),
               legend.background = element_rect(fill = "transparent", 
                                                color = NA),
@@ -1576,10 +1604,10 @@ plot.els$blank <- list(
                           strip.text = element_blank(),
                           axis.ticks.y = element_line(color="black"),
                           axis.line.y = element_line(color="black"),
-                          axis.text.x =  element_text(size = 6, color="white"),
-                          axis.title.x =  element_text(size = 7, color="white"),
-                          axis.ticks.x =  element_line(color="white"),
-                          axis.line.x =  element_line(color="white")))
+                          axis.text.x = element_text(size = 6, color="white"),
+                          axis.title.x = element_text(size = 7, color="white"),
+                          axis.ticks.x = element_line(color="white"),
+                          axis.line.x = element_line(color="white")))
 
 # normal plots theme elements
 plot.els$norm <- list(  
@@ -1601,29 +1629,31 @@ plot.els$FeAl <- list(data.frame(section = c("Festningen", "Deltadalen")) %>%
                                        filter(phase == "Fe[tot]/Al") %>% 
                                        pull("value")
                                 ),
-                  data.frame(section = "Festningen", 
-                             phase = plot.els$PRS_fest$phase,
-                             xmin = plot.els$PRS_fest$avg - 
-                                    plot.els$PRS_fest$sd,
-                             xmax = plot.els$PRS_fest$avg + 
-                                    plot.els$PRS_fest$sd,
-                             mean = plot.els$PRS_fest$avg),
-                  data.frame(section = "Deltadalen", 
-                             phase = plot.els$PRS_dd$phase,
-                             xmin = plot.els$PRS_dd$avg - 
-                                    plot.els$PRS_dd$sd,
-                             xmax = plot.els$PRS_dd$avg + 
-                                    plot.els$PRS_dd$sd,
-                             mean = plot.els$PRS_dd$avg)) %>% 
+                      data.frame(section = "Festningen", 
+                                 phase = plot.els$PRS_fest$phase,
+                                 xmin = plot.els$PRS_fest$avg - 
+                                        plot.els$PRS_fest$sd,
+                                 xmax = plot.els$PRS_fest$avg + 
+                                        plot.els$PRS_fest$sd,
+                                 mean = plot.els$PRS_fest$avg),
+                      data.frame(section = "Deltadalen", 
+                                 phase = plot.els$PRS_dd$phase,
+                                 xmin = plot.els$PRS_dd$avg - 
+                                        plot.els$PRS_dd$sd,
+                                 xmax = plot.els$PRS_dd$avg + 
+                                        plot.els$PRS_dd$sd,
+                                 mean = plot.els$PRS_dd$avg)) %>% 
                         reduce(. , bind_rows) %>% 
-                        gather(. , "key", "value", -c(section, 
+                          gather(. , "key", "value", -c(section, 
                                                       phase)) %>% 
-                        mutate(alpha_f = if_else(key == "mean", 2, 1)) %>% 
-             mutate(phase = factor(phase, levels = c("Fe[tot]/Al", 
-                                                     "Fe[PRS]/Fe[tot]"), 
-                            ordered = TRUE
-                              )
-                 )
+                           mutate(alpha_f = if_else(key == "mean", 2, 1)) %>% 
+                           mutate(phase = 
+                                    factor(phase, 
+                                           levels = c("Fe[tot]/Al", 
+                                                      "Fe[PRS]/Fe[tot]"), 
+                                  ordered = TRUE
+                                  )
+                                )
 
 # relevant stratigraphic horizons for common plot
 # Festningen
@@ -1632,7 +1662,7 @@ plot.els$PTX_hor_f <- list(geom_hline(yintercept = 3.87, color = "darkgrey"),
                                       color = "darkgrey")) 
 # Deltadalen
 plot.els$PTX_hor_d <-list(geom_hline(yintercept = 84, color = "darkgrey"), 
-                          geom_hline(yintercept = 87, linetype=2, 
+                          geom_hline(yintercept = 87, linetype = 2, 
                                      color = "darkgrey")) 
 
 ```
@@ -1669,7 +1699,8 @@ sec.select <-  "Festningen"
 plot.1.f <- plot.1 %>%
               filter(section == sec.select) %>% 
               ggplot( . , aes(y = height, x = value)) +  
-              geom_blank(data = range.1 %>% filter(section == sec.select), 
+              geom_blank(data = range.1 %>% 
+                           filter(section == sec.select), 
                          aes(y = height, x = value))  
 
 plot.1.f_pr <- plot.1.f +
@@ -1699,7 +1730,8 @@ sec.select <-  "Deltadalen"
 plot.1.d <- plot.1 %>%
               filter(section == sec.select) %>% 
               ggplot( . , aes(y = height, x = value)) + 
-              geom_blank(data = range.1 %>% filter(section == sec.select), 
+              geom_blank(data = range.1 %>% 
+                           filter(section == sec.select), 
                        aes(y = height, x = value)) 
 
 plot.1.d_pr <- plot.1.d +
@@ -1746,36 +1778,36 @@ pg$widths[j.plot] <- 0.5 * sum(pg$widths[j.plot])
 x.range <- ggplot_build(plot.1.f_bl)$layout$panel_params[[1]]$x.range
 y.range <- ggplot_build(plot.1.f_bl)$layout$panel_params[[1]]$y.range
 
-plot.els$x.range.f <-  x.range
-plot.els$y.range.f <-  y.range
+plot.els$x.range.f <- x.range
+plot.els$y.range.f <- y.range
 
 # filter to only use stratigraphic bounds contained within the plot
 
 filter.BB_chron <- BB_chron %>% 
+                     mutate(type = factor(type, 
+                                          levels = c("Period", 
+                                                     "Formation"))
+                            ) %>%
+                     filter(top >= min(y.range), bottom <= max(y.range)) %>%
+                     rowwise() %>%
+                     mutate(bottom = 
+                              max(bottom, min(y.range)), 
+                            top = min(top, max(y.range))
+                            ) %>%
+                     ungroup() %>%
+                     mutate(height = (top - bottom) / 
+                              (max(top) - min(bottom))
+                            ) %>%
+                     select(name, type, R, G, B, height) %>%
+                     arrange(type)
 
-  mutate(type = factor(type, levels = c("Period", "Formation"))) %>%
-
-  filter(top >= min(y.range), bottom <= max(y.range)) %>%
-  
-  rowwise() %>%
-  
-  mutate(bottom = max(bottom, min(y.range)), top = min(top, max(y.range))) %>%
-  
-  ungroup() %>%
-  
-  mutate(height = (top - bottom) / (max(top) - min(bottom))) %>%
-
-
-  select(name, type, R, G, B, height) %>%
-  
-  arrange(type)
-
-unique.types <- unique(filter.BB_chron$type) %>% as.character()
+unique.types <- unique(filter.BB_chron$type) %>% 
+                 as.character()
 
 # create empty gtable
 gt <- gtable(widths = rep(unit(0.2, "null"), 
-                          times = length(unique.types)),
-                          heights = unit(1, "null"))
+             times = length(unique.types)),
+             heights = unit(1, "null"))
 
 # fill gtable with individual table grobs for each type of geologic time
 
@@ -1788,37 +1820,44 @@ for(i in seq_along(unique.types)){
                   heights = unit(period.df$height, "null"),
                   widths = unit(0.2, "null"),
                   theme = ttheme_minimal(
-                    core = list(bg_params = list(fill = rgb(period.df$R,
-                                                            period.df$G, 
-                                                            period.df$B, 
-                                                            maxColorValue=255),
-                                                 col = "black"),
-                                fg_params = list(rot = 90, fontsize=6L))
-                  ))
-
+                             core = list(bg_params = 
+                                           list(fill = 
+                                                  rgb(period.df$R,
+                                                      period.df$G, 
+                                                      period.df$B, 
+                                                 maxColorValue = 255),
+                                                col = "black"),
+                                         fg_params = 
+                                           list(rot = 90, 
+                                                fontsize = 6L)
+                                          )
+                                        )
+                   )
 
   gt <- gtable_add_grob(x = gt,
                         grobs = tt,
-                        t = 1, l = i)
-
+                        t = 1, 
+                        l = i)
 }
 
 # add lithological column
 img <- readPNG(paste0(data.path, "/data/litho/Festningen_litho_simple.png"))
 
-Fest_lith <- rasterGrob(img, height = unit(1,"npc"), width= unit(2,"npc"),  
-                        x=unit(0,"npc"))
+Fest_lith <- rasterGrob(img, 
+                        height = unit(1,"npc"), 
+                        width = unit(2,"npc"),  
+                        x = unit(0,"npc"))
 
-gt <- gtable_add_cols(gt, widths= unit(0.3, "null"))
-gt <- gtable_add_grob(x = gt, grobs = Fest_lith, t=1, l=3)
+gt <- gtable_add_cols(gt, widths = unit(0.3, "null"))
+gt <- gtable_add_grob(x = gt, grobs = Fest_lith, t = 1, l = 3)
 
 # add gtable to original plot panel
 
 for(i in i.axis){
   pg.fest <- gtable_add_grob(x = pg,
-                        grobs = gt,
-                        t = i,
-                        l = j.plot[1])
+                             grobs = gt,
+                             t = i,
+                             l = j.plot[1])
 }
 
 
@@ -1838,27 +1877,34 @@ pg$widths[j.plot] <- 0.5 * sum(pg$widths[j.plot])
 x.range <- ggplot_build(plot.1.d_bl)$layout$panel_params[[1]]$x.range
 y.range <- abs(ggplot_build(plot.1.d_bl)$layout$panel_params[[1]]$y.range)
 
-plot.els$x.range.d <-  x.range
-plot.els$y.range.d <-  y.range
+plot.els$x.range.d <- x.range
+plot.els$y.range.d <- y.range
 
 # filter to only use stratigraphic bounds contained within the plot
 
 filter.BB_chron <- BB_chron %>% 
-  mutate(type = factor(type, levels = c("Period", "Formation"))) %>%
-  filter(top <= max(y.range), bottom >= min(y.range)) %>%
-  rowwise() %>%
-  mutate(bottom = min(bottom, max(y.range)), top = max(top, min(y.range))) %>%
-  ungroup() %>%
-  mutate(height = (bottom - top) / (max(bottom) - min(top))) %>%
-  select(name, type, R, G, B, height) %>%
-  arrange(type)
+                    mutate(type = factor(type, 
+                                         levels = c("Period", "Formation"))
+                           ) %>%
+                    filter(top <= max(y.range), bottom >= min(y.range)) %>%
+                    rowwise() %>%
+                    mutate(bottom = min(bottom, max(y.range)), 
+                           top = max(top, min(y.range))
+                           ) %>%
+                    ungroup() %>%
+                    mutate(height = (bottom - top) / 
+                             (max(bottom) - min(top))
+                           ) %>%
+                    select(name, type, R, G, B, height) %>%
+                    arrange(type)
 
-unique.types <- unique(filter.BB_chron$type) %>% as.character()
+unique.types <- unique(filter.BB_chron$type) %>% 
+                  as.character()
 
 # create empty gtable
 gt <- gtable(widths = rep(unit(0.2, "null"), 
-                          times = length(unique.types)),
-                          heights = unit(1, "null"))
+             times = length(unique.types)),
+             heights = unit(1, "null"))
 
 # fill gtable with individual table grobs for each type of geologic time
 
@@ -1871,28 +1917,39 @@ for(i in seq_along(unique.types)){
                   heights = unit(period.df$height, "null"),
                   widths = unit(0.2, "null"),
                   theme = ttheme_minimal(
-                    core = list(bg_params = list(fill = rgb(period.df$R,
-                                                            period.df$G, 
-                                                            period.df$B, 
-                                                            maxColorValue=255),
-                                                 col = "black"),
-                                fg_params = list(rot = 90, fontsize=6L))
-                  ))
+                              core = list(bg_params = 
+                                            list(fill = 
+                                                  rgb(period.df$R,
+                                                      period.df$G, 
+                                                      period.df$B, 
+                                                      maxColorValue = 255),
+                                                  col = "black"),
+                                          fg_params = 
+                                            list(rot = 90, 
+                                                 fontsize = 6L)
+                                          )
+                                         )
+                  )
 
   gt <- gtable_add_grob(x = gt,
                         grobs = tt,
-                        t = 1, l = i)
+                        t = 1, 
+                        l = i)
 }
 
 # add lithological column
 img <- readPNG(paste0(data.path, "data/litho/DD_log_simple.png"))
-Fest_lith <- rasterGrob(img, height = unit(1,"npc"), width= unit(2,"npc"), 
+Fest_lith <- rasterGrob(img, 
+                        height = unit(1,"npc"), 
+                        width = unit(2,"npc"), 
                         x=unit(0,"npc"))
+
 gt <- gtable_add_cols(gt, widths= unit(0.3, "null"))
-gt <- gtable_add_grob(x = gt, grobs = Fest_lith, t=1, l=3)
+gt <- gtable_add_grob(x = gt, grobs = Fest_lith, t = 1, l = 3)
 
 # add gtable to original plot panel
 for(i in i.axis){
+  
   pg.DD <- gtable_add_grob(x = pg,
                            grobs = gt,
                            t = i,
@@ -1962,25 +2019,29 @@ plot.2 <- all.CD.long %>%
 # range set by geom blank to create equal x ranges for facets from different 
 # sections          
 range.2 <- plot.2 %>% 
-           group_by(phase) %>% 
-           mutate(value = max(value, na.rm = TRUE)) %>% 
-           group_by(section) %>% 
-           mutate(value = if_else(height == min(height, na.rm = TRUE),
-                                  0, value)) %>% 
-           ungroup()
+             group_by(phase) %>% 
+             mutate(value = max(value, na.rm = TRUE)) %>% 
+             group_by(section) %>% 
+             mutate(value = if_else(height == min(height, na.rm = TRUE),
+                                    0, value)) %>% 
+             ungroup()
 
 # Festningen                                                        
 sec.select <-  "Festningen"
+
 plot.2.f <- plot.2 %>%
               filter(section == sec.select) %>% 
               ggplot( . , aes(y = height, x = value)) +  
-              geom_blank(data = range.2 %>% filter(section == sec.select), 
+              geom_blank(data = range.2 %>% 
+                           filter(section == sec.select), 
                          aes(y = height, x = value))  
 
 plot.2.f_pr <- plot.2.f +
                 plot.els$PTX_hor_f + 
                 geom_point() +
-                facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
+                facet_grid(cols = vars(phase),  
+                           scales = "free", 
+                           switch = "x", 
                            labeller = label_parsed) +
                 ggtitle(sec.select) +
                 plot.els$norm 
@@ -1990,13 +2051,16 @@ sec.select <-  "Deltadalen"
 plot.2.d <- plot.2 %>%
               filter(section == sec.select) %>% 
               ggplot( . , aes(y = height, x = value)) + 
-              geom_blank(data = range.2 %>% filter(section == sec.select), 
+              geom_blank(data = range.2 %>% 
+                           filter(section == sec.select), 
                        aes(y = height, x = value)) 
 
 plot.2.d_pr <- plot.2.d +
                 plot.els$PTX_hor_d + 
                 geom_point() +
-                facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
+                facet_grid(cols = vars(phase),  
+                           scales = "free", 
+                           switch = "x", 
                            labeller = label_parsed) +
                 ggtitle(sec.select) +
                 scale_y_reverse() +

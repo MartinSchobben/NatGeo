@@ -9,7 +9,7 @@ output:
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
 author: 
 - Martin Schobben^[School of Earth and Environment, University of Leeds, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G.Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, The Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
-abstract: "The global spread of marine anoxia has been proposed as a major driver of the end-Permian mass extinction---the most devastating biotic crisis of the Phanerozoic. However, the mechanism that drove large stretches of the ocean to an anoxic state is unclear. Here, we utilize a combined geochemical and palaeontological approach to show that, prior to the extinction, enhanced weathering driven by Siberian Traps volcanism increased the oceanic influx of phosphorus. This promoted increased primary productivity and thus the development of oxygen depleted waters in proximal settings. However, bioavailable phosphorus was also efficiently sequestered in the sediment in association with iron minerals. This limited phosphorus recycling back to the water column and hence restricted the intensity and spatial extent of oxygen-depleted waters. A critical threshold was then crossed, whereby the collapse of vegetation on land immediately prior to the extinction horizon changed the weathering regime, leading to significantly enhanced redox-promoted remobilization of bioavailable phosphorus. This resulted in a positive productivity feedback that stimulated the spread of sulfidic waters across large portions of the shelf. This model reconciles an apparent contradiction between the timing of enhanced weathering and the development of widespread ocean anoxia, which in turn, was a potent kill mechanism for benthic species that were unable to migrate to shallow and deeper shelf environments."   
+abstract: "The global spread of marine anoxia has been proposed as a major driver of the end-Permian mass extinction---the most devastating biotic crisis of the Phanerozoic. However, the mechanism that drove large stretches of the ocean to an anoxic state is unclear. Here, we utilize a combined geochemical and palaeontological approach to show that, prior to the extinction, enhanced weathering driven by Siberian Traps volcanism increased the oceanic influx of phosphorus. This promoted increased primary productivity and thus the development of oxygen depleted waters in proximal settings. However, bioavailable phosphorus was also efficiently sequestered in the sediment in association with iron minerals. This limited phosphorus recycling back to the water column and hence restricted the intensity and spatial extent of oxygen-depleted waters. A critical threshold was then crossed, whereby the collapse of vegetation on land immediately prior to the extinction horizon changed the weathering regime, leading to significantly enhanced redox-promoted remobilization of bioavailable phosphorus. This resulted in a positive productivity feedback that stimulated the spread of sulfidic waters across large portions of the shelf. This model reconciles an apparent contradiction between the timing of enhanced weathering and the development of widespread ocean anoxia, which in turn, was a potent kill mechanism for benthic species that were unable to migrate to shallow and deeper shelf environments." 
 bibliography: library.bib
 ---
 
@@ -20,10 +20,11 @@ bibliography: library.bib
 ```{r setup, include=FALSE}
 
 # default knitr options
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, dpi = 300, 
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      dpi = 300, 
                       digits = 2)
-
-
 
 # following code for loading and writing the bibtex references for the used 
 # packages is adapted from the blog post: //www.r-bloggers.com/bibliography-with-knitr-cite-your-references-and-packages/,
@@ -37,7 +38,6 @@ packages <- c("tidyverse", # plotting, datawrangling
               "bibtex",    # writing bibtex files
               "grid",      # drawing
               "png")    
-
 
 # load packages
 invisible(lapply(packages, library, character.only = TRUE))
@@ -74,8 +74,6 @@ cat(paste("% Automatically generated", Sys.time()), "\n% DO NOT EDIT",
 rref<- rref %>% 
   enframe() %>% 
   mutate(value = "@rversion")
-
-
 
 data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/"
 
@@ -125,24 +123,26 @@ theme_replace(
 
 # default ggplot color generator
 ggplotColours <- function(n = 6, h = c(0, 360) + 15){
+                            
                             if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n
-                          hcl(h = (seq(h[1], h[2], length = n)), c = 100, 
-                              l = 65)
+                            
+                            hcl(h = (seq(h[1], h[2], length = n)), 
+                                c = 100, 
+                                l = 65)
                           }
 
 # plot elements: static boundaries redox conditions
 # static bound anoxic and sulfidic water column
 
-plot.els$anox <- data.frame(phase = as.character(c(
+plot.els$anox <- tibble(phase = as.character(c(
                                           rep(c(bquote(Fe[HR]/Fe[tot])), 2),  
                                           rep(c(bquote(Fe[py]/Fe[HR])), 2))), 
-                            value = c(0.2, 0.38, 0.7, NA), 
-                            pos.x = c(0.08, 0.49, 0.6, 0.8),
-                            pos.y = c(-16.7, -17, -18.5, -17),
-                            text.lab = c("oxic", "anoxic", 
-                                         "ferruginous", "euxinic"),
-                            state = c(rep("anox", 2), "eux", NA)) %>% 
-                  as_tibble() 
+                        value = c(0.2, 0.38, 0.7, NA), 
+                        pos.x = c(0.08, 0.49, 0.6, 0.8),
+                        pos.y = c(-16.7, -17, -18.5, -17),
+                        text.lab = c("oxic", "anoxic", 
+                                     "ferruginous", "euxinic"),
+                        state = c(rep("anox", 2), "eux", NA))
 
 
 # glauconite occurence
@@ -173,12 +173,21 @@ ggplot_grad_rects <- function(n, ymin, ymax, xmin, xmax, col.f, sec,
                       alpha = alpha_steps,
                       section = sec)
   list(geom_rect(data = rect_grad,
-                  aes(xmin=xmin, xmax=xmax,
-                      ymin=ymin, ymax=ymax,
-                      alpha=alpha), inherit.aes = FALSE, fill = col.f) ,
+                  aes(xmin = xmin, 
+                      xmax = xmax,
+                      ymin = ymin, 
+                      ymax = ymax,
+                      alpha=alpha), 
+                 inherit.aes = FALSE, 
+                 fill = col.f) ,
   guides(alpha = FALSE),
-  annotate(geom = "text", x = xmin + ((xmax-xmin)/2), y = ypos , label = lab.ev, 
-           size = 2.5, angle = 90))}
+  annotate(geom = "text", 
+           x = xmin + ((xmax - xmin) / 2), 
+           y = ypos , 
+           label = lab.ev, 
+           size = 2.5, 
+           angle = 90))
+  }
 
 ```
 
@@ -211,27 +220,30 @@ plot.1 <- all.CD.long %>%
 # range set by geom blank to create equal x ranges for facets from different 
 # sections          
 range.1 <- plot.1 %>% 
-           group_by(phase) %>% 
-           mutate(value = if_else(str_detect(phase, "Fe"), 1, 
-                                  max(value, na.rm = TRUE))) %>% 
-           ungroup() %>% 
-           group_by(section) %>% 
-           mutate(value = if_else(height == min(height, na.rm = TRUE),
-                                  0, value)) %>% 
-           ungroup()
+             group_by(phase) %>% 
+             mutate(value = if_else(str_detect(phase, "Fe"), 1, 
+                                    max(value, na.rm = TRUE))
+                    ) %>% 
+              ungroup() %>% 
+              group_by(section) %>% 
+              mutate(value = if_else(height == min(height, na.rm = TRUE),
+                                     0, value)
+                     ) %>% 
+             ungroup()
 
 # Festningen                                                        
 sec.select <-  "Festningen"
 plot.1.f <- plot.1 %>%
               filter(section == sec.select) %>% 
               ggplot( . , aes(y = height, x = value)) +  
-              geom_blank(data = range.1 %>% filter(section == sec.select), 
+              geom_blank(data = range.1 %>% 
+                           filter(section == sec.select), 
                          aes(y = height, x = value))  
 
 plot.1.f_pr <- plot.1.f + 
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
                            labeller = label_parsed) +
-                # adding box for equivocal area of Fe[py]/Fe[HR] on plot
+  # adding box for equivocal area of Fe[py]/Fe[HR] on plot
                 geom_rect(data = tibble(xmin = 0.2,
                                         xmax = 0.38,
                                         ymin = plot.els$y.range.f[1],
@@ -241,29 +253,43 @@ plot.1.f_pr <- plot.1.f +
                                                     c(bquote(Fe[HR]/Fe[tot])))),
                           aes(xmin = xmin, xmax = xmax,
                               ymin = ymin, ymax = ymax),
-                          inherit.aes = FALSE, fill = "lightgrey",
+                          inherit.aes = FALSE, 
+                          fill = "lightgrey",
                           alpha = 0.3, color = "transparent") +
                 plot.els$PTX_hor_f +
-                geom_vline(data = plot.els$anox, aes(xintercept = value,
-                                                     color = state), 
-                           linetype = 3, size = 0.8) +  
-                geom_text(data = tibble(x = 0, y = 10,
+                geom_vline(data = plot.els$anox, 
+                           aes(xintercept = value,
+                           color = state), 
+                           linetype = 3, 
+                           size = 0.8) +  
+                geom_text(data = tibble(x = 0, 
+                                        y = 10,
                                         phase = factor("HR_FeT", 
                                                        levels = c("HR_FeT"),
                                                     c(bquote(Fe[HR]/Fe[tot]))),
                                         text.lab = "equivocal"),
-                          aes(x = x, y = y, label = text.lab),
+                          aes(x = x, 
+                              y = y, 
+                              label = text.lab),
                           inherit.aes = FALSE, angle = 90) +
-                geom_segment(data = tibble(x = 0.1, y = 10,
-                                           xend = 0.3, yend = 10,
-                                        phase = factor("HR_FeT",
+                geom_segment(data = tibble(x = 0.1, 
+                                           y = 10,
+                                           xend = 0.3, 
+                                           yend = 10,
+                                           phase = factor("HR_FeT",
                                                        levels = c("HR_FeT"),
                                                     c(bquote(Fe[HR]/Fe[tot])))),
-                          aes(x = x, y = y, xend = xend, yend= yend),
-                          arrow = arrow(angle = 30, length = unit(0.1, "cm")))+
-                geom_text(data = plot.els$anox,
-                          aes(x = pos.x, y = pos.y, label = text.lab),
-                              angle = 90) +
+                            aes(x = x, 
+                                y = y, 
+                                xend = xend, 
+                                yend = yend),
+                            arrow = arrow(angle = 30, 
+                                          length = unit(0.1, "cm")))+
+                  geom_text(data = plot.els$anox,
+                            aes(x = pos.x, 
+                                y = pos.y, 
+                                label = text.lab),
+                                angle = 90) +
                 geom_point(aes(fill = corr), shape = 21) +
                 scale_fill_manual(values = c("uncorr" = "white",  
                                              "corr" = "black")) +
@@ -285,7 +311,9 @@ plot.d13C.f <- all.CD.long %>%
                 scale_x_continuous(limits = range.d13C, 
                                    breaks = seq(range.d13C[1], range.d13C[2], 
                                                 by = 2))+
-                facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
+                facet_grid(cols = vars(phase),  
+                           scales = "free", 
+                           switch = "x", 
                            labeller = label_parsed) +
                 plot.els$norm + 
                 annotate("text", label= "extinction \n horizon", 
@@ -388,13 +416,18 @@ plot.1.d_pr <- plot.1.d +
                                         phase = factor("HR_FeT", 
                                                        levels = c("HR_FeT"),
                                                     c(bquote(Fe[HR]/Fe[tot])))),
-                          aes(xmin = xmin, xmax = xmax,
-                              ymin = ymin, ymax = ymax),
-                          inherit.aes = FALSE, fill = "lightgrey",
+                          aes(xmin = xmin, 
+                              xmax = xmax,
+                              ymin = ymin, 
+                              ymax = ymax),
+                          inherit.aes = FALSE, 
+                          fill = "lightgrey",
                           alpha = 0.3, color = "transparent") +
-                geom_vline(data = plot.els$anox, aes(xintercept = value,
-                                                     color = state), 
-                           linetype = 3, size = 0.8) +  
+                geom_vline(data = plot.els$anox, 
+                           aes(xintercept = value,
+                               color = state), 
+                           linetype = 3, 
+                           size = 0.8) +  
                 plot.els$PTX_hor_d +
                 geom_point(aes(fill = corr), shape = 21) +
                 scale_fill_manual(values = c("uncorr" = "white",  
@@ -584,11 +617,13 @@ MOE.text <- tibble(section = rep("b) Festningen (distal)", 3),
                    y.pos = c(5, 37, 43))
 
 plot.2.d <- plot.2 %>%
-                ggplot( . , aes(y = Mo_EF, x = U_EF)) 
+              ggplot( . , aes(y = Mo_EF, x = U_EF)) 
   
 plot.2.d_pr <- plot.2.d +
                 facet_grid(cols = vars(section)) +
-                geom_line(data = MOU.df, aes(y = Mo_EF, x = U_EF, group = key),
+                geom_line(data = MOU.df, aes(y = Mo_EF, 
+                                             x = U_EF, 
+                                             group = key),
                           linetype = 2) +
                 geom_point(aes(color = valueRD)) +
                 coord_trans(x= 'log10',y = 'log10') + 
@@ -621,7 +656,9 @@ plot.2.d_b <- plot.2.d +
                 facet_grid(cols = vars(RD)) +
                 ylab(expression(Mo[EF]))+
                 xlab(expression(U[EF]))+
-                geom_line(data = MOU.df, aes(y = Mo_EF, x = U_EF, group = key)) +
+                geom_line(data = MOU.df, aes(y = Mo_EF, 
+                                             x = U_EF, 
+                                             group = key)) +
                 coord_trans(x= 'log10',y = 'log10') +
                 scale_y_continuous(breaks = c(0.1,1, 10, 100)) +
                 scale_x_continuous(limits = c(0.1, max.range), 
@@ -755,14 +792,16 @@ ggsave("figures/Fig2.tiff", cr_plots, height = 7, width = 20, unit = "cm")
 
 # data selection, ordering 
 plot.3 <- all.CD.long %>% 
-          filter(section == "Festningen" | section == "Deltadalen") %>% 
-          filter(phase == "P_Al" | phase == "TOC" | phase == "Corg_Porg" |  
-                 phase == "Corg_Preac") %>% 
-          mutate(value = if_else(phase == "Corg_Porg", value/100, value))
+            filter(section == "Festningen" | section == "Deltadalen") %>% 
+            filter(phase == "P_Al" | 
+                   phase == "TOC" | 
+                   phase == "Corg_Porg" |  
+                   phase == "Corg_Preac") %>% 
+            mutate(value = if_else(phase == "Corg_Porg", value / 100, value))
 
 # store outlier of P/Al (2.0)
 plot.3.out <- all.CD.long %>%
-              filter(phase == "P_Al" & value > 1.5)  
+                filter(phase == "P_Al" & value > 1.5)  
 
 # filter-out outlier of P/Al (2.0)
 plot.3 <- setdiff(plot.3, plot.3.out)
@@ -774,24 +813,28 @@ plot.3.out <- plot.3.out %>%
               
 # labelling
 plot.3 <- plot.3 %>% 
-          mutate(phase = factor(phase,
-                                levels = c("P_Al", "TOC",
-                                        "Corg_Porg",
-                                        "Corg_Preac"),
-                                c(bquote(P[tot]/Al~"(mass)"),
-                                  bquote(C[org]~"(wt \u0025)"),
-                                  expression(paste(C[org]/P[org], 
-                                                   "\n \u00d7", 
-                                                   10^2, 
-                                                   " (molar)")),
-                                  bquote(C[org]/P[reac]~"(molar)")
-                                  ),
-                             ordered = TRUE
-                              )
-                 ) 
+            mutate(phase = factor(phase,
+                                  levels = c("P_Al", 
+                                             "TOC",
+                                             "Corg_Porg",
+                                             "Corg_Preac"
+                                             ),
+                                            c(bquote(P[tot]/Al~"(mass)"),
+                                            bquote(C[org]~"(wt \u0025)"),
+                                            expression(paste(C[org]/P[org], 
+                                                       "\n \u00d7", 
+                                                       10^2, 
+                                                       " (molar)")),
+                                            bquote(C[org]/P[reac]~"(molar)")
+                                             ),
+                                  ordered = TRUE
+                                )
+                   ) 
 
 plot.3.out <- plot.3.out %>% 
-              mutate(phase = factor(phase, levels = "P_Al",
+                mutate(phase = 
+                         factor(phase, 
+                                levels = "P_Al",
                                 c(bquote(P[tot]/Al~"(mass)"))))
 
 
@@ -806,24 +849,31 @@ range.3 <- plot.3 %>%
            ungroup()
 
 # P static bounds
-plot.els$P.bounds <- tibble(phase = factor(c("P_Al", "TOC",
-                                        "Corg_Porg",
-                                        "Corg_Preac"), 
-                                        levels = c("P_Al", "TOC",
-                                        "Corg_Porg",
-                                        "Corg_Preac"),
-                                c(bquote(P[tot]/Al~"(mass)"),
-                                  bquote(C[org]~"(wt \u0025)"),
-                                  expression(paste(C[org]/P[org], "\n \u00d7", 
-                                                   10^2, 
-                                                   " (molar)")),
-                                  bquote(C[org]/P[reac]~"(molar)")
-                                  ),
-                             ordered = TRUE),
+plot.els$P.bounds <- tibble(phase = factor(c("P_Al", 
+                                             "TOC",
+                                             "Corg_Porg",
+                                             "Corg_Preac"), 
+                                           levels = 
+                                             c("P_Al", 
+                                               "TOC",
+                                               "Corg_Porg",
+                                               "Corg_Preac"),
+                                           c(bquote(P[tot]/Al~"(mass)"),
+                                             bquote(C[org]~"(wt \u0025)"),
+                                             expression(paste(C[org]/P[org], 
+                                                              "\n \u00d7", 
+                                                              10^2, 
+                                                              " (molar)")),
+                                             bquote(C[org]/P[reac]~"(molar)")
+                                            ),
+                                           ordered = TRUE),
                             value = c(ls.Chem$PAAS %>% 
                                         filter(phase == "P_Al") %>%  
                                         pull(value), NA, 1.06, 106),
-                            state = c("PAAS", NA, "Redfield", "Redfield"),
+                            state = c("PAAS", 
+                                      NA, 
+                                      "Redfield", 
+                                      "Redfield"),
                             text.lab = c("average shale", 
                                          rep(NA, 2), 
                                          "Redfield"),
@@ -990,6 +1040,7 @@ str_plots <- grid.arrange(DD, fest, nrow = 2)
 # save plots external
 ggsave(paste0(data.path, "figures/Fig3.tiff"), 
        str_plots , height = 14, width = 14, unit = "cm")
+
 ```
 
 
