@@ -559,24 +559,27 @@ all.Fe <-  all.CRS %>%
 #===============================================================================
 # function for P spec conversion to rock sample concentration 
 AbCalib <- function(Absorb, C_lab, Calib){
-  
-  TA <- NULL
-  
-  for(i in 1:length(Absorb)){ 
-    
-  TA <- c(TA, unname(((lm(ppm~A, 
-                           Calib[[which(names(Calib) %in% 
-                                          C_lab[i])]]))$coefficients)[2] *
-  Absorb[i] +
-  ((lm(ppm~A, Calib[[which(names(Calib) %in% C_lab[i])]]))$coefficients)[1]))
-  
-  }
-  
-  TA[which(TA < 0)] <- 0
-  
-  return(TA)
-  
+
+   CTA <- lm(ppm ~ A, pluck(Calib, C_lab))
+
+   TA <- CTA$coefficients[2] * Absorb + CTA$coefficients[1]
+
 }
+
+# for(i in 1:length(Absorb)){
+# 
+# TA <- c(TA, unname(((lm(ppm~A,
+#                          Calib[[which(names(Calib) %in%
+#                                          C_lab[i])]]))$coefficients)[2] *
+#  Absorb[i] +
+# ((lm(ppm~A, Calib[[which(names(Calib) %in% C_lab[i])]]))$coefficients)[1]))
+# 
+#  }
+#  
+# TA[which(TA < 0)] <- 0
+#   
+# return(TA)
+# }
 
 # P spec from photospectrometer conversion to rock sample concentration  
 all.P <- all.P %>% 
