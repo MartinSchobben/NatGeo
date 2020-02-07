@@ -13,6 +13,7 @@ author:
 bibliography: biblio.bib
 ---
 
+
 ```{r setup, include=FALSE}
  
 # default knitr options
@@ -82,9 +83,11 @@ data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spits
 
 ```
 
+
 ##### Page Break
 
 This supplementary information files contains additional on the applied methods, data quality and additional discussion on the fidelity of the geochemical signals. Data as well as the R Markdown scripts for data processing, statistics and visualization are provided along with this document.
+
 
 ```{r}
 
@@ -92,14 +95,23 @@ This supplementary information files contains additional on the applied methods,
 gl.ID <- c("ID", "section", "section.ID")
 # chemical data (QC values etc)
 ls.Chem <- list()
+# levels for phases
+lv.ph <- c("Fe_mag", "Fe_ox", "CDB", "Det", "Fe_carb", "Fe_PRS", "Fe_py",
+           "P_mag", "P_ox2", "P_ox1", "P_aut", "P_det", "P_org",
+           "TOC",
+           "d13C",
+           "d34S",
+           "Fe", "Al", "P", "Mo", "U", "Re")
+# levels for methods
+lv.mt <- c("Pspec", "Fespec", "CRS", "LECO", "EA", "EA-MS", "TD")
 
 #===============================================================================
 # elemental data
 #===============================================================================
 
 # sample labels and weights
-ID     <- read.csv(paste0(data.path, "data/samplelist/SampleIDs.csv"), 
-                   stringsAsFactors = FALSE) %>% as_tibble()
+ID  <- read_csv(paste0(data.path, "data/samplelist/SampleIDs.csv")) %>% 
+          rename(section.ID = `section ID`)  
 
 #-------------------------------
 # loading Fe spec data
@@ -108,61 +120,61 @@ ID     <- read.csv(paste0(data.path, "data/samplelist/SampleIDs.csv"),
 ls.Fe <- list.files(path = paste0(data.path, "data/Fe_seq"), 
                     pattern = "_ed.csv")
 
-all.Fe <- map_df(ls.Fe %>% set_names(), ~read.csv(file = 
+all.Fe <- map_df(ls.Fe %>% set_names(), ~read_csv(file = 
                                                     paste0(data.path, 
-                                                          "data/Fe_seq/", .x),
-                                                  stringsAsFactors = FALSE),
+                                                          "data/Fe_seq/", .x)),
                  .id = "path") %>%
-          filter(str_detect(ID, "MS")) %>%
-          mutate(phase = factor(
-                          case_when(
-                            str_detect(path, pattern = "AmOx") ~ "Fe_mag",
-                            str_detect(path, pattern = "CDA")  ~ "Fe_ox",
-                            str_detect(path, pattern = "CDB")  ~ "CDB",
-                            str_detect(path, pattern = "Det")  ~ "Det",
-                            str_detect(path, pattern = "NaAc") ~ "Fe_carb",
-                            str_detect(path, pattern = "BH") ~ "Fe_PRS"
-                 ))) %>%
-          mutate(method = factor(
-                            if_else(str_detect(path, pattern = "_P_"),
-                                    "Pspec","Fespec")
+            filter(str_detect(ID, "MS")) %>%
+            mutate(phase = factor(
+                             case_when(
+                              str_detect(path, pattern = "AmOx") ~ "Fe_mag",
+                              str_detect(path, pattern = "CDA")  ~ "Fe_ox",
+                              str_detect(path, pattern = "CDB")  ~ "CDB",
+                              str_detect(path, pattern = "Det")  ~ "Det",
+                              str_detect(path, pattern = "NaAc") ~ "Fe_carb",
+                              str_detect(path, pattern = "BH") ~ "Fe_PRS"
+                                      ),
+                             levels = lv.ph 
+                                  )
+                   ) %>%
+            mutate(method = factor(
+                              if_else(str_detect(path, pattern = "_P_"),
+                                      "Pspec", "Fespec"),
+                              level = lv.mt
                  ))
 
 # seperate Fe sequentials of P speciation protocol
 all.Fe.P <- all.Fe %>%
-            filter(method == "Pspec")
+              filter(method == "Pspec")
 
 # merge Fe spec data with sample IDs
 all.Fe <- all.Fe %>%
-           filter(method == "Fespec") %>%
-           left_join( . ,ID, by="ID") %>%
+            filter(method == "Fespec") %>%
+            left_join( . , ID, by = "ID") %>%
 # remove samples without section identifier
-           drop_na(section.ID)
+            drop_na(section.ID)
 
 #-------------------------------
 # loading CRS data
 #-------------------------------
 # list of CRS datafiles
 ls.CRS <- list.files(path = paste0(data.path, "data/CRS"), pattern = ".csv")
-all.CRS <- map_df(ls.CRS %>% set_names(), 
-                  ~read.csv(file = paste0(data.path, "data/CRS/", .x),
-                                                      stringsAsFactors = FALSE),
+all.CRS <- map_df(ls.CRS %>% 
+                    set_names(), 
+                  ~read_csv(file = paste0(data.path, "data/CRS/", .x)),
                   .id = "path")
 
 #-------------------------------
 # loading Total Digest (TD) data
 #-------------------------------
-all.TD  <-list(
-               read.csv(paste0(data.path, "data/totals/Total_Sum_ed.csv"), 
-                        stringsAsFactors = FALSE) %>%
-                  as_tibble() %>%
+all.TD <- list(
+               read_csv(paste0(data.path, "data/totals/Total_Sum_ed.csv")) %>%
                   group_by(ID) %>%
                   mutate(newID = row_number()),
-               read.csv(paste0(data.path, "data/totals/Total_Sum_TE_ed.csv"), 
-                        stringsAsFactors = FALSE) %>%
-                  as_tibble() %>%
+               read_csv(paste0(data.path, "data/totals/Total_Sum_TE_ed.csv")) %>%
                   group_by(ID) %>%
-                  mutate(newID = row_number())) %>%
+                  mutate(newID = row_number())
+               ) %>%
             reduce(full_join, by = c("ID", "newID")) %>%
             left_join( . ,ID, by="ID") %>%
             select(-newID)
@@ -171,7 +183,8 @@ all.TD  <-list(
 # loading P spec data
 #-------------------------------
 # list of P seq datafiles
-ls.P <- list.files(path = paste0(data.path, "data/P_seq"), pattern = ".xls") %>%
+ls.P <- list.files(path = paste0(data.path, "data/P_seq"), 
+                   pattern = ".xls") %>%
          set_names()
 
 # calibration curve labeller
@@ -192,10 +205,10 @@ all.P <- map_df(ls.P, ~read_xls(path = paste0(data.path, "data/P_seq/",.x)),
 
 # create unique labels for P seq data
 P_labs <- all.P %>%
-          group_by(ID) %>%
-          arrange(ID) %>%
-          distinct_at(vars(ID, section.ID, section, weight_gram)) %>%
-          ungroup()
+            group_by(ID) %>%
+            arrange(ID) %>%
+            distinct_at(vars(ID, section.ID, section, weight_gram)) %>%
+            ungroup()
 
 # list of calibration curves
 ls.Clb <- map(ls.P, ~ excel_sheets(path = 
@@ -235,57 +248,58 @@ CBs.com <- flatten(list(CBs_dec, CBs_jan, CBs_march, CBs_oct))
 ls.ICP.P  <- list.files(path = paste0(data.path, "data/P_seq/ICP"), 
                         pattern = ".csv")
 
-all.ICP.P <- map_df(ls.ICP.P %>% set_names(),
-                    ~read.csv(file = paste0(data.path, "data/P_seq/ICP/", .x), 
-                              stringsAsFactors = FALSE),
+all.ICP.P <- map_df(ls.ICP.P %>% 
+                      set_names(),
+                    ~read_csv(file = paste0(data.path, "data/P_seq/ICP/", .x)),
                     .id = "path") %>%
-              mutate(phase =
+              mutate(phase = factor(
                               case_when(
                                   str_detect(path, pattern = "AmOx") ~ "P_mag",
                                   str_detect(path, pattern = "CDA")  ~ "P_ox2",
                                   str_detect(path, pattern = "CDB")  ~ "P_ox1"
-                 )) %>%
-              mutate(unit = "%", method = "Pspec") %>%
+                                        ),
+                              levels = lv.ph
+                                   )
+                     ) %>%
+              mutate(unit = "%", 
+                     method = factor("Pspec", levels = lv.mt)) %>%
               select(ID, value = ppm, phase, unit, method)
 
 #-------------------------------
 # loading TOC data
 #-------------------------------
 # Festningen
-TOC_fest <-read.csv(paste0(data.path, "data/TOC/", "MS_TOC_sep2016.csv"), 
-                    stringsAsFactors=FALSE) %>%
-           as_tibble() %>% select(ID = Name, value = Carbon)
+TOC_fest <-read_csv(paste0(data.path, "data/TOC/", "MS_TOC_sep2016.csv")) %>%
+            select(ID = Name, value = Carbon)
 
 # Deltadalen
-TOC_dd <-read.csv(paste0(data.path, "data/TOC/", "MS_TOC_march2018.csv"), 
-                  stringsAsFactors=FALSE)%>%
-           as_tibble() %>% select(section.ID = Name, value = Carbon)
+TOC_dd <-read_csv(paste0(data.path, "data/TOC/", "MS_TOC_march2018.csv")) %>% 
+          select(section.ID = Name, value = Carbon)
 
 # sample labels TOC
-ID_TOC     <- read.csv(paste0(data.path, "data/samplelist/SampleIDs_TOC.csv"), 
-                       stringsAsFactors=FALSE) %>% 
-              as_tibble()
+ID_TOC <- read_csv(paste0(data.path, "data/samplelist/SampleIDs_TOC.csv")) 
 
 # merge with sample identifiers
 TOC_fest <- full_join(TOC_fest, ID_TOC, by="ID") %>%
-            filter(section=="Festningen") %>%
-            mutate(method = "LECO")
-TOC_dd   <- full_join(TOC_dd, ID_TOC  , by="section.ID") %>%
-            filter(section=="Deltadalen")%>%
-            mutate(method = "EA")
+              filter(section=="Festningen") %>%
+              mutate(method = factor("LECO", levels = lv.mt))
+TOC_dd <- full_join(TOC_dd, ID_TOC  , by="section.ID") %>%
+             filter(section=="Deltadalen")%>%
+             mutate(method = factor("EA", levels = lv.mt))
 
 # combine TOC Festningen (LECO) with Deltadalen (EA)
 all.TOC <- bind_rows(TOC_fest, TOC_dd)
 
 # correct TOC for weight loss during acid digestion
-all.TOC <- all.TOC %>% mutate(value = ((1 - ((weight_tube_gram +
-                                              weight_samples_gram) -
-                                              weight_after_gram) /
-                                              weight_samples_gram) * value),
-                              phase = "TOC",
-                              unit = "%") %>%
-                        select(gl.ID, phase, method, value, unit) %>%
-                        drop_na()
+all.TOC <- all.TOC %>% 
+            mutate(value = ((1 - ((weight_tube_gram +
+                                   weight_samples_gram) -
+                                   weight_after_gram) /
+                                   weight_samples_gram) * value),
+                    phase = factor("TOC", levels = lv.ph),
+                    unit = "%") %>%
+            select(gl.ID, phase, method, value, unit) %>%
+            drop_na()
 
 ```
 
@@ -299,39 +313,31 @@ all.TOC <- all.TOC %>% mutate(value = ((1 - ((weight_tube_gram +
 #-------------------------------
 # loading d13C data
 #-------------------------------
-all.d13C   <- read.csv(paste0(data.path, "data/Cisotope/d13C_march2018_ed.csv"),
-                       stringsAsFactors=FALSE) %>%
-                        as_tibble() %>%
+all.d13C   <- read_csv(paste0(data.path, 
+                              "data/Cisotope/d13C_march2018_ed.csv")) %>%
                         mutate(section = if_else(str_detect(section.ID, "DD"),
                                                  "Deltadalen", "Festningen"),
-                               phase = "d13C",
-                               method = "EA-MS",
+                               phase = factor("d13C", levels = lv.ph),
+                               method = factor("EA-MS", levels = lv.mt),
                                value = d13C,
                                unit = "\u2030") %>%
-                       select(-d13C)
+                        select(-d13C)
 
-# summary stats for d13C QCs
-sum_stat_d13C <- read.csv(paste0(data.path,
-                                 "data/Cisotope/d13C_Stds_march2018.csv"),
-                          stringsAsFactors = FALSE) %>%
-                          as_tibble() %>%
-                          group_by(ID) %>%
-                          summarize(mean = mean(d13C),
-                                    sd = sd(d13C),
-                                    n = n()) %>%
-                          mutate(assigned = NA) %>%
-                          column_to_rownames(var = "ID")%>%
-                          mutate_if(is.numeric, round, digits = 1)
-
+#-------------------------------
 # loading d34S data
+#-------------------------------
+
 d34S_fest <- read.csv(paste0(data.path, "data/Sisotope/d34S_Fest.csv"),
                       stringsAsFactors = FALSE) %>% as_tibble()
-d34S_DD <- read.csv(paste0(data.path, "data/Sisotope/d34S_DD.csv"),
-                    stringsAsFactors = FALSE) %>% as_tibble()
+d34S_DD <- read_csv(paste0(data.path, "data/Sisotope/d34S_DD.csv"))
 
 # function for name reformatting
-stringy<-function(x) {cm<-strsplit(x, split = "-") 
-            return(cm[[1]][2])}
+stringy<-function(x) {
+      
+  cm <- strsplit(x, split = "-") 
+  
+  return(cm[[1]][2])
+  }
 
 # reformatting raw data output (only Festningen)
 d34S_fest <- d34S_fest %>% 
@@ -376,11 +382,11 @@ d34S_fest <- left_join(d34S_fest, d34S_bl, by = "SN")
 d34S_fest <- d34S_fest %>%
 # exclusion of data with wrong retention time (~300 sec is appropriate)
 # exclusion of data with too low and too high intensity (Amp)
-             filter(RT > 295 & RT < 305,Amps > 0.9 & Amps < 4) %>%
-             group_by(Name, block) %>%
+               filter(RT > 295 & RT < 305,Amps > 0.9 & Amps < 4) %>%
+               group_by(Name, block) %>%
 # selection of the second duplo if avalaible to prevent signal smearing
-             top_n(1, SN) %>%
-             ungroup()
+               top_n(1, SN) %>%
+               ungroup()
 
 # assigned values S reference material
 ls.Chem$Sref   <- tibble(Name = c("S3", "CP", "sws"), 
@@ -396,16 +402,16 @@ scale.checker <- function(x){
                                   
 # include measured S reference isotope values
 ls.Chem$S.c <- ls.Chem$Sref %>% 
-               mutate(diff.real = real - lag(real)) %>% 
-               left_join( . , d34S_fest %>% 
-               filter(section == "standard") %>% 
-               group_by(Name) %>% 
-               summarise (sample = mean(S34)), by = "Name") %>% 
-               mutate(diff.sample = sample - lag(sample)) %>% 
-               rowwise() %>% 
-               mutate(scale.C = diff.sample / diff.real)  %>% 
-               ungroup()
-                  
+                 mutate(diff.real = real - lag(real)) %>% 
+                 left_join( . , d34S_fest %>% 
+                   filter(section == "standard") %>% 
+                     group_by(Name) %>% 
+                     summarise (sample = mean(S34)), by = "Name") %>% 
+                     mutate(diff.sample = sample - lag(sample)) %>% 
+                     rowwise() %>% 
+                     mutate(scale.C = diff.sample / diff.real)  %>% 
+                     ungroup()
+
 # checking for scale compression
 # scale.checker(ls.Chem$S.c$scale.C)
 
@@ -415,40 +421,39 @@ s_fun <- function(mod) {coefficients(mod)[[2]]}
 i_fun <- function(mod) {coefficients(mod)[[1]]} 
 
 d34S_fest <- d34S_fest %>% 
-             group_by(block) %>% 
-             filter(section == "standard") %>%
-             left_join(ls.Chem$Sref, by = "Name") %>%  
-             drop_na() %>% 
-             nest() %>%  
+               group_by(block) %>% 
+               filter(section == "standard") %>%
+               left_join(ls.Chem$Sref, by = "Name") %>%  
+                 drop_na() %>% 
+                 nest() %>%  
 # linear regression for calibration of d34S
-             mutate(model = map(data, mod_fun)) %>% 
+                 mutate(model = map(data, mod_fun)) %>% 
 # extraction of coefficients and merge with m.blocks
-             mutate(slope = map_dbl(model, s_fun), 
-                    int = map_dbl(model, i_fun)) %>% 
-             select(block, slope, int) %>% 
-             left_join(d34S_fest, . , by = "block") %>% 
-             rowwise() %>% 
-             mutate (S34 = S34 * slope + int) %>% 
-             ungroup()
+                 mutate(slope = map_dbl(model, s_fun), 
+                        int = map_dbl(model, i_fun)) %>% 
+                 select(block, slope, int) %>% 
+                 left_join(d34S_fest, . , by = "block") %>% 
+                   rowwise() %>% 
+                   mutate (S34 = S34 * slope + int) %>% 
+                   ungroup()
 
-# summary stats for d34S QCs
-sum_stat_d34S <- d34S_fest %>% filter(section == "standard") %>% 
-                 group_by(Name) %>% 
-                 summarize(mean = mean(S34), sd = sd(S34), n=n()) %>% 
-                 mutate(assigned=c(ls.Chem$as_CP1,
-                                   NA,
-                                   ls.Chem$as_S3, 
-                                   ls.Chem$as_sws)) %>% 
-                 column_to_rownames(var = "Name") %>% 
-                 mutate_if(is.numeric, round, digits = 1)
+
 
 all.d34S <- bind_rows(d34S_fest %>% 
                       filter(section == "sample") , 
                       d34S_DD) %>% 
-            mutate(section = if_else(str_detect(Name, "Fe"), "Festningen", 
-                                     "Deltadalen"),
-                   phase = "d34S", method = "EA-MS", unit = "\u2030") %>% 
-            select(section.ID = Name, section, phase, method, value = S34, unit)
+              mutate(section = if_else(str_detect(Name, "Fe"), 
+                                       "Festningen", 
+                                       "Deltadalen"),
+                     phase = factor("d34S", levels = lv.ph), 
+                     method = factor("EA-MS", levels = lv.mt), 
+                     unit = "\u2030") %>% 
+              select(section.ID = Name, 
+                     section, 
+                     phase, 
+                     method, 
+                     value = S34, 
+                     unit)
 
 ```
 
@@ -460,8 +465,8 @@ all.d34S <- bind_rows(d34S_fest %>%
 #===============================================================================
 
 # function describing the formulation used to derive the rock element 
-# concentration (wt.%), requiring the machine output (ppm), solution volume (ml)
-# and sample weight (g).
+# concentration (wt. %), requiring the machine output (solution unit), 
+# solution volume (ml) and sample weight (g).
 
 EWeight <- function(Output, Output.unit = "ppm", Volume, Weight){ 
                         
@@ -470,7 +475,8 @@ EWeight <- function(Output, Output.unit = "ppm", Volume, Weight){
                         if(Output.unit == "ppt"){unit <- 10^-10}
                                                           
                       (Output * unit * Volume) / Weight 
-                    }
+}
+
 ```
 
 
@@ -481,11 +487,11 @@ EWeight <- function(Output, Output.unit = "ppm", Volume, Weight){
 #===============================================================================
 # Fe spec conversion to rock sample concentration     
 all.Fe <- all.Fe %>%
-          rowwise() %>% 
-          mutate(value = EWeight(ppm, Output.unit = "ppm", V, weight_gram)) %>%
-          ungroup() %>% 
-          select(-c(Abs, RSD, V, weight_gram, ppm)) %>% 
-          mutate(unit = "%")
+            rowwise() %>% 
+            mutate(value = EWeight(ppm, Output.unit = "ppm", V, weight_gram)) %>%
+            ungroup() %>% 
+            select(-c(Abs, RSD, V, weight_gram, ppm)) %>% 
+            mutate(unit = "%")
 
 #---------------------------
 # QCs
@@ -493,28 +499,31 @@ all.Fe <- all.Fe %>%
 # reject in-house standard HN22, as n = 1
 remove <- c("HN22")
 all.Fe <- all.Fe %>% 
-          filter(!section.ID %in% remove)
+            filter(!section.ID %in% remove)
 
 # store QCs Fe spec
 all.QC <- all.Fe %>% 
-          filter(section == "Standard")
+            filter(section == "Standard")
 #---------------------------
 # duplicates 
 #---------------------------
 # storing duplicates
-dups.Fe <- all.Fe %>% group_by(phase, section.ID) %>%
-                      filter(n() > 1 & !section == "Standard") %>%
-                      summarise(value = mean(value), 
-                                method = unique(method), 
-                                section = unique(section)) %>% 
-                      drop_na() %>% 
-                      ungroup()
+dups.Fe <- all.Fe %>% 
+             group_by(phase, section.ID) %>%
+             filter(n() > 1 & !section == "Standard") %>%
+              summarise(value = mean(value), 
+                        method = unique(method), 
+                        section = unique(section)) %>% 
+              drop_na() %>% 
+              ungroup()
 
 # take mean values for duplicates
-all.Fe <- all.Fe %>% group_by(phase, section.ID) %>%
-                     filter(n() < 2 & !section == "Standard") %>% 
-                     bind_rows( . , dups.Fe) %>% 
-                     select(gl.ID, height, phase, method, value, unit)
+all.Fe <- all.Fe %>% 
+            group_by(phase, section.ID) %>%
+            filter(n() < 2 & !section == "Standard") %>% 
+            bind_rows( . , dups.Fe) %>% 
+            select(gl.ID, height, phase, method, value, unit) %>% 
+            ungroup()
 
 #===============================================================================                    
 # function describing the conversion which is used to derive the CRS-bound Fe 
@@ -525,19 +534,22 @@ CRSWeight <- function(AG2S, Weight){(AG2S * 0.129 * 0.871 * 100) / Weight}
 
 # CRS conversion to rock sample concentration, and join
 all.Fe <-  all.CRS %>% 
-           rowwise %>% 
-           mutate(value = CRSWeight((Weight_final - Weight_filter), 
-                                     Weight_gram)) %>% 
-           ungroup() %>% 
-           right_join( . , all.Fe %>% filter(phase == "Fe_mag") %>% 
-                                    select(gl.ID, height), 
-                       by = "section.ID") %>% 
-           mutate(unit = "%", phase = "Fe_py", method = "CRS") %>% 
-           select(gl.ID, height, phase, method, value, unit) %>% 
-           bind_rows(all.Fe)
+             rowwise %>% 
+             mutate(value = CRSWeight((Weight_final - Weight_filter), 
+                                      Weight_gram)) %>% 
+             ungroup() %>% 
+             right_join( . , all.Fe %>% 
+                              filter(phase == "Fe_mag") %>% 
+                              select(gl.ID, height), 
+                        by = "section.ID") %>% 
+               mutate(unit = "%", 
+                      phase = factor("Fe_py", levels = lv.ph), 
+                      method = factor("CRS", levels = lv.mt)
+                      ) %>% 
+               select(gl.ID, height, phase, method, value, unit) %>% 
+               bind_rows(all.Fe)
            
 ```
-
 
 
 ```{r}
@@ -547,56 +559,73 @@ all.Fe <-  all.CRS %>%
 #===============================================================================
 # function for P spec conversion to rock sample concentration 
 AbCalib <- function(Absorb, C_lab, Calib){
+  
   TA <- NULL
+  
   for(i in 1:length(Absorb)){ 
     
-  TA <- c( TA, unname(((lm(ppm~A, 
+  TA <- c(TA, unname(((lm(ppm~A, 
                            Calib[[which(names(Calib) %in% 
-                                          C_lab[i])]]))$coefficients)[2]*
-  Absorb[i]+
+                                          C_lab[i])]]))$coefficients)[2] *
+  Absorb[i] +
   ((lm(ppm~A, Calib[[which(names(Calib) %in% C_lab[i])]]))$coefficients)[1]))
   
   }
+  
   TA[which(TA < 0)] <- 0
+  
   return(TA)
+  
 }
 
 # P spec from photospectrometer conversion to rock sample concentration  
 all.P <- all.P %>% 
-         rowwise() %>% 
-         mutate(value = EWeight(AbCalib(Absorb = A, C_lab = Calib, 
-                                        Calib = CBs.com), "ppm", V, 
-                                        weight_gram)) %>%
-         mutate(phase = case_when(
+            rowwise() %>% 
+            mutate(value = EWeight(AbCalib(Absorb = A, 
+                                           C_lab = Calib, 
+                                           Calib = CBs.com), 
+                                    "ppm", 
+                                    V, 
+                                    weight_gram)
+                   ) %>%
+            mutate(phase = factor(
+                                case_when(
                                          str_detect(Label, "CDB") ~ "P_ox1",
                                          str_detect(Label, "CDA") ~ "P_ox2",
                                          str_detect(Label, "NaAc") ~ "P_aut",
                                          str_detect(Label, "HCl1") ~ "P_det",
                                          str_detect(Label, "AmOx") ~ "P_mag",
                                          str_detect(Label, "HCl2") ~ "P_org"
-                )) %>%
-         ungroup() %>% 
-         mutate(unit = "%", method = "Pspec") %>% 
-         select(gl.ID, value, unit, method, weight_gram, Label, phase)
+                                         ),
+                                levels = lv.ph
+                                  )
+                   ) %>%
+            ungroup() %>% 
+            mutate(unit = "%", 
+                   method = factor("Pspec", levels = lv.mt)) %>% 
+            select(gl.ID, value, unit, method, weight_gram, Label, phase)
             
 all.P <- all.ICP.P %>%  
-         left_join( . , all.P %>% filter(Label == "CDB_MgCl") %>%  
-                        select(gl.ID, weight_gram), by = "ID") %>% 
-         rowwise() %>% 
-         mutate(value = EWeight(value, "ppm", 10, weight_gram)) %>% 
-         ungroup() %>%
-         bind_rows(. , all.P %>% select(-Label)) %>% 
-         group_by(phase, ID, section.ID, section, unit,  method) %>% 
-         summarise(value = sum(value)) %>% 
-         ungroup() %>%
-         select(gl.ID, phase, method, value, unit)
+          left_join( . , all.P %>% 
+                           filter(Label == "CDB_MgCl") %>%  
+                           select(gl.ID, weight_gram), 
+                     by = "ID") %>% 
+           rowwise() %>% 
+           mutate(value = EWeight(value, "ppm", 10, weight_gram)) %>% 
+           ungroup() %>%
+           bind_rows(. , all.P %>% 
+                       select(-Label)) %>% 
+           group_by(phase, ID, section.ID, section, unit,  method) %>% 
+           summarise(value = sum(value)) %>% 
+           ungroup() %>%
+           select(gl.ID, phase, method, value, unit)
 
 #---------------------------             
 # QCs P spec
 #---------------------------
 all.QC <- all.P %>% 
-          filter(section == "Standard") %>% 
-          bind_rows( . , all.QC)
+           filter(section == "Standard") %>% 
+           bind_rows( . , all.QC)
 
 # remove QCs P spec
 all.P <- all.P %>% 
@@ -604,8 +633,6 @@ all.P <- all.P %>%
                  !section == "Standard_test")             
   
 ```
-
-
 
 
 ```{r}
@@ -622,10 +649,16 @@ TD.sc <- list(major = c("Fe", "Al", "P"),
 all.TD <- all.TD %>% 
             select(one_of(c(gl.ID, "height", unlist(TD.sc), "weight_gram"))) %>% 
             gather(key = "phase", value = "value", 
-                   -c(gl.ID, "weight_gram", "height")) %>% 
-            mutate(Output.unit = case_when(phase %in% TD.sc$major ~ "ppm",
-                                  phase %in% TD.sc$minor ~ "ppb",
-                                  phase %in% TD.sc$ultra ~ "ppt")) %>% 
+                   -c(gl.ID, "weight_gram", "height")
+                   ) %>% 
+            mutate(phase = factor(phase, levels = lv.ph)) %>% 
+            mutate(Output.unit = 
+                            case_when(
+                                      phase %in% TD.sc$major ~ "ppm",
+                                      phase %in% TD.sc$minor ~ "ppb",
+                                      phase %in% TD.sc$ultra ~ "ppt"
+                                     )
+                   ) %>% 
             rowwise() %>% 
 # calculating actual concentration,converting units to ppm for TE (ppb for Re)
             mutate(value = case_when(Output.unit == "ppm"~ 
@@ -640,11 +673,11 @@ all.TD <- all.TD %>%
                                     )
                    ) %>% 
           ungroup() %>% 
-          # actual units of element rock concentration
+  # actual units of element rock concentration
           mutate(unit = case_when(Output.unit == "ppm" ~ "%",
                                   Output.unit == "ppb" ~ "ppm",
                                   Output.unit == "ppt" ~ "ppb")) %>% 
-          mutate(method = "TD") %>% 
+          mutate(method = factor("TD", levels = lv.mt)) %>% 
           select(gl.ID, height, phase, method, value, unit, weight_gram)
           
 # two samples with wrong volume solution 10ml HCl instead of 5ml HCl
@@ -678,6 +711,7 @@ all.TD <- all.TD %>%
 # Geological setting
 
 The Svalbard island group is situated between 74 and 81$\,$°N on the northwestern part of the Barents Shelf (Supplementary Fig \@ref(fig:FigGeograph)). During Permian time the area was part of an extensive shelf on the northwestern margin of Pangaea situated at a palaeolatitude of ~40--45$\,$°N (Supplementary Fig \@ref(fig:FigPaleoGeo)). A fold-and-thrust belt, ranging over more than 300$\,$km, exposes Palaeozoic, Mesozoic and Cenozoic strata along the west coast of the main island (Spitsbergen) from the Brøgger peninsula in the North to the Sørkapp in the southernmost tip. The Festningen site (78.09$\,$°N, 13.88\,$°$E) on  the southern entrance of the Isfjorden (Western Nordenskiöld Land) is an easily accessible and frequently studied stratigraphic profile. At this site strata dips at a ~45$\,$° angle in a eastward direction as part of the short limb of a NNW--SSE-striking assymetric syncline [@Harland1997; @Grasby2015a]. The coastal cliffs of the Festningen site extend in an E-W direction providing an easy accessible opportunity to traverse the strata. A second P--Tr stratigraphic sequence at Deltadalen (78.27$\,$°N, 16.88$\,$°E) was drilled south of the coast of the Sassenfjorden/Tempelfjorden. Here Permian and Triassic strata are relatively flat-lying with only minor folds and thrusts[@Mork1999].  
+
 
 ```{r eval=FALSE}
 
@@ -880,6 +914,7 @@ ggsave(paste0(data.path, "figures/SuppFig2.tiff"), gg)
 
 ```
 
+
 # Lithostratigraphy and facies description
 
 The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with subordinate cherty mudstones, brachiopod and bryozoan-rich limestones and glauconitic sandstones[@Blomeier2013; @Dustira2013, @Bond2015, @Zuchuat]. Although substantial differences between the lithologies of outer Isfjorden of western-most Spitsbergen (Festningen) and inner Isfjorden of central Spitsbergen (Deltadalen), which has led to the proposal of two distinct members; the Hovtinden and Stensiöfjellet members, respectively, these units grade laterally into each other (Supplementary Fig \@ref(fig:FigLithostrat))[@Blomeier2013] and can therefore be correlated.  These two lithologies are interpreted to record shallow marine, high energy conditions in the inner Isfjorden (Stensiöfjellet Member)[@Zuchuat] whilst dark shales and cherts dominated in more distal, deeper locations (Hovtinden Member) that occurred in the outer Isfjorden[@Blomeier2013; @Bond2017]. Our study section at Festningen comprises the most expanded development of the Kapp Starostin Formation and has relatively thin beds of limestone indicating its distal, deep water development compared to the more easterly Deltadalen site. This sand-rich site was probably part of the inner sandy shelf that developed in north and east Spitsbergen in the Permian (Supplementary Fig \@ref(fig:FigGeograph)).
@@ -924,7 +959,8 @@ all.CD.long <- list(all.TD,
                                     filter(phase == "Fe") %>%  
                                     select(section.ID, height), 
                                   by = "section.ID") %>% 
-                          mutate(height = height / 100)
+                          mutate(height = height / 100) %>% 
+                          filter(section != "Akkamori") 
                     
 all.CD.wide <- all.CD.long %>%   
                  select(-c(method, ID, unit)) %>% 
@@ -950,7 +986,6 @@ good <- c(section.ID = "section ID", section = "section", height = "height (m)",
 
 # save all the different files for each of the sections
 df.extr <- all.CD.wide  %>%  
-             filter(section != "Akkamori") %>% 
              group_by(section) %>% 
              arrange_at(vars(section, contains("height")), desc) %>% 
 # rename columns  
@@ -1128,7 +1163,7 @@ all.CD.wide <- all.CD.wide %>%
 # molar Corg over Porg  
                  mutate(Corg_Porg  = 
                           ifelse(P_org > 0 ,
-                                  (TOC / atomicweight$C) / 
+                                    (TOC / atomicweight$C) / 
                                   (P_org / atomicweight$P), NA),
 # molar Corg over Preac                        
                           Corg_Preac = 
@@ -1183,18 +1218,18 @@ ls.Chem$PAAS <- tibble(value =
 
 all.CD.wide <- all.CD.wide %>%
 # MoEF               
-               mutate(Mo_EF = Mo_Al / ls.Chem$PAAS %>% filter(phase == 
-                                                                "Mo_Al") %>% 
-                        pull(value),
+               mutate(Mo_EF = Mo_Al / ls.Chem$PAAS %>% 
+                                        filter(phase == "Mo_Al") %>% 
+                                        pull(value),
 # UEF                     
-                      U_EF = U_Al / ls.Chem$PAAS %>% filter(phase == 
-                                                                "U_Al") %>% 
-                        pull(value),
+                      U_EF = U_Al / ls.Chem$PAAS %>% 
+                                        filter(phase == "U_Al") %>% 
+                                        pull(value),
 
 # ReEF
-                      Re_EF = Re_Al / ls.Chem$PAAS %>% filter(phase  == 
-                                                                "Re_Al") %>% 
-                        pull(value)
+                      Re_EF = Re_Al / ls.Chem$PAAS %>% 
+                                        filter(phase  == "Re_Al") %>% 
+                                        pull(value)
                       )
 
 
@@ -1202,11 +1237,10 @@ all.CD.wide <- all.CD.wide %>%
 # complete dataset for subsequent processing
 #-------------------------------------------
 
-all.CD.long <- all.CD.wide %>% gather(key = phase, value = value, 
-                                      -c(section, section.ID, height))
-
-# write file for consecutive processing in main Rmd file
-write.csv(all.CD.long, "all.CD.long.csv") 
+all.CD.long <- all.CD.wide %>% 
+                  gather(key = phase, 
+                         value = value, 
+                         -c(section, section.ID, height))
 
 ```
 
@@ -1220,7 +1254,8 @@ ls.Chem$corr_Alox <- with(atomicweight, (Al * 2 /(Al * 2 + O * 3)))
 
 # USGS reference values
 # SBC-1
-ls.Chem$SBC <- tibble(phase = c("Fe", "P", "Al", "Mo", "U"),
+ls.Chem$SBC <- tibble(phase = factor(c("Fe", "P", "Al", "Mo", "U"),
+                                     levels = lv.ph),
                       assigned = c(9.71 * ls.Chem$corr_Feox,
                                    0.37 * ls.Chem$corr_Pox,
                                    21 * ls.Chem$corr_Alox,
@@ -1229,7 +1264,8 @@ ls.Chem$SBC <- tibble(phase = c("Fe", "P", "Al", "Mo", "U"),
                       name = "SBC-1") 
 
 #SGR-1 Potsdam Georem
-ls.Chem$SGR <- tibble(phase = c("Fe", "P", "Al", "Mo", "U"),
+ls.Chem$SGR <- tibble(phase = factor(c("Fe", "P", "Al", "Mo", "U"), 
+                                     levels =  lv.ph),
                       assigned = c(3.03 * ls.Chem$corr_Feox,
                                    0.328 * ls.Chem$corr_Pox,
                                    6.52 * ls.Chem$corr_Alox,
@@ -1242,70 +1278,73 @@ ls.Chem$SGR <- tibble(phase = c("Fe", "P", "Al", "Mo", "U"),
 #---------------------------
 # summary statistics external standards Fe spec
 sum.QC.Fe <- all.QC %>% 
-          mutate(section.ID = replace(section.ID, 
-                                      section.ID == "WHIT-1 TEST", 
-                                      "WHIT")) %>% 
-          filter(method == "Fespec") %>% 
-          mutate(phase = case_when(phase == "Fe_ox" ~ "Fe~ox~",
-                                   phase == "Fe_mag" ~ "Fe~mag~",
-                                   phase == "Fe_PRS" ~ "Fe~PRS~",
-                                   phase == "Fe_carb" ~ "Fe~carb~")) %>% 
-          group_by(phase, section.ID) %>%
-          summarise(mean  = mean(value),
-                    SD = sd(x=value),
-                    RSD = formatC((sd(x = value) / mean(value)) * 100, 
+              mutate(section.ID = replace(section.ID, 
+                                          section.ID == "WHIT-1 TEST", 
+                                          "WHIT")) %>% 
+              filter(method == "Fespec") %>% 
+              mutate(phase = case_when(phase == "Fe_ox" ~ "Fe~ox~",
+                                       phase == "Fe_mag" ~ "Fe~mag~",
+                                       phase == "Fe_PRS" ~ "Fe~PRS~",
+                                       phase == "Fe_carb" ~ "Fe~carb~")
+                     ) %>% 
+             group_by(phase, section.ID) %>%
+             summarise(mean = mean(value),
+                       SD = sd(x=value),
+                       RSD = formatC((sd(x = value) / mean(value)) * 100, 
                                     digits = 0, format= "f"),
-                    n = n()) %>% 
-          ungroup() %>% 
-          filter(mean > 0.01) %>%
-          arrange(match(phase, c("Fe_carb", "Fe_ox", "Fe_mag", "Fe_PRS"))) %>% 
-          mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
-          rename(name = section.ID)
+                       n = n()) %>% 
+             ungroup() %>% 
+             filter(mean > 0.01) %>%
+             arrange(match(phase, c("Fe_carb", "Fe_ox", "Fe_mag", "Fe_PRS"))) %>% 
+             mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
+             rename(name = section.ID)
 
 # summary statistics external standards P spec         
 sum.QC.P <- all.QC %>% 
-          filter(method == "Pspec") %>% 
-          mutate(phase = case_when(phase == "P_aut" ~ "P~ap~",
-                                   phase == "P_det" ~ "P~det~",
-                                   phase == "P_org" ~ "P~org~")) %>% 
-          group_by(phase, section.ID) %>%
-          summarise(mean  = mean(value),
-                    SD = sd(x=value),
-                    RSD = formatC((sd(x = value) / mean(value)) * 100, 
-                                    digits = 0, format= "f"),
-                    n = n()) %>% 
-          ungroup() %>% 
-          filter(mean > 0.002) %>% 
-          arrange(match(phase, c("P_aut", "P_ox2", "P_det", "P_org"))) %>% 
-          mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
-          rename(name = section.ID)
+              filter(method == "Pspec") %>% 
+              mutate(phase = case_when(phase == "P_aut" ~ "P~ap~",
+                                       phase == "P_det" ~ "P~det~",
+                                       phase == "P_org" ~ "P~org~")) %>% 
+              group_by(phase, section.ID) %>%
+              summarise(mean = mean(value),
+                        SD = sd(x=value),
+                        RSD = formatC((sd(x = value) / mean(value)) * 100, 
+                                      digits = 0, format= "f"),
+                        n = n()) %>% 
+              ungroup() %>% 
+              filter(mean > 0.002) %>% 
+              arrange(match(phase, c("P_aut", "P_ox2", "P_det", "P_org"))) %>% 
+              mutate_at(vars(phase), ~(replace(., duplicated(.), ""))) %>% 
+              rename(name = section.ID)
   
 # summary statistics external standards TD
 sum.QC.TD <- all.QC %>% 
-          filter(method == "TD") %>% 
-           
-          group_by(phase, section.ID) %>%
-          summarise(mean  = mean(value),
-                    SD = sd(x=value),
-                    `RSD (%)` = formatC((sd(x = value) / mean(value)) * 100, 
-                                    digits = 0, format= "f"),
-                    n = n()) %>% 
-          ungroup() %>% 
-          drop_na(mean) %>%  
-          rename(name = section.ID) %>% 
-          left_join(ls.Chem$SBC, by = c("phase", "name")) %>% 
-          left_join(ls.Chem$SGR, by = c("phase", "name")) %>% 
-          mutate(assigned = coalesce(assigned.x, assigned.y)) %>% 
-          select(-c(assigned.x, assigned.y)) %>% 
-          mutate(phase = factor(phase, levels =c("Al", "Fe", "P", "Mo", 
+               filter(method == "TD") %>% 
+               group_by(phase, section.ID) %>%
+               summarise(mean  = mean(value),
+                         SD = sd(x=value),
+                         `RSD (%)` = formatC((sd(x = value) / 
+                                                mean(value)) * 100, 
+                                             digits = 0, format= "f"),
+                         n = n()) %>% 
+               ungroup() %>% 
+               drop_na(mean) %>%  
+               rename(name = section.ID) %>% 
+               left_join(ls.Chem$SBC, by = c("phase", "name")) %>% 
+               left_join(ls.Chem$SGR, by = c("phase", "name")) %>% 
+               mutate(assigned = coalesce(assigned.x, assigned.y)) %>% 
+               select(-c(assigned.x, assigned.y)) %>% 
+               mutate(phase = factor(phase, 
+                                     levels =c("Al", "Fe", "P", "Mo", 
                                                  "U", "Re"),
-                                c("Al", "Fe~tot~", "P~tot~", "Mo*", "U*", 
-                                  "Re**"),
-                                ordered = TRUE
-                                )
-                 ) %>% 
-          mutate(phase = as.character(phase)) %>% 
-          mutate_at(vars(phase), ~(replace(., duplicated(.), "")))
+                                     c("Al", "Fe~tot~", "P~tot~", 
+                                       "Mo*", "U*", 
+                                       "Re**"),
+                                     ordered = TRUE
+                                    )
+                      ) %>% 
+               mutate(phase = as.character(phase)) %>% 
+               mutate_at(vars(phase), ~(replace(., duplicated(.), "")))
           
 ```
 
@@ -1327,7 +1366,7 @@ knitr::kable(sum.QC.TD, digits = 2, row.names = FALSE,  format = "pandoc",
 
 ```
 
-In addition, sequential extraction procedures were applied to separate different sedimentary Fe and P phases. Firstly, the Fe speciation was used to reconstruct water column redox conditions, by combining sequential extractions, after ref. @Poulton2005, with iron-sulfide extractions, by chromium-reducible sulfur (CRS), after ref. @Canfield1986. Combined these methods yields six operationally-defined Fe fractions (Supplementary Table \@ref(tab:TablePropFe)). Non-sulfidized iron was liberated during the sequential extraction scheme applied to a sample split of ~70$\,$mg, with solutions specifically targeting ferrous carbonates (Fe~carb~), Fe-(oxyhydr)oxides (Fe~ox~; such as, ferrihydrite, lepidocrocite, goethite and hematite) and magnetite (Fe~mag~). A further iron reservoir (termed 'poorly reactive Fe'; or Fe~PR~) was solubilized by boiling a sample split with 12$\,$N HCl [@Raiswell1994]. By substracting Fe~HR~ (not including pyrite, which is not extracted by a boiling HCl extraction, after ref. @Raiswell1994) from Fe~PR~, the fraction of iron contained in less reactive sheet silicate minerals (termed ‘poorly reactive sheet silicate Fe’; or Fe~PRS~) was obtained[@Raiswell1996; @Raiswell1998]. This iron phase is only poorly reactive to dissolved sulfide[@Raiswell1996], on a long timescale of 10^5^--10^6^$\,$y. However, Fe~HR~ is commonly transferred to the Fe~PRS~ pool during diagenesis under Fe reducing conditions in the absence of significant dissolved sulfide (see Supplementary Section \@ref(dia) and the main text). The iron content of the various extractions was obtained by Atomic Absorption Spectrometry (AAS; Thermo Scientific, iCE 3000 Series). The CRS method solubilized metal sulfides (among which iron sulfides are by far the dominant contributor) from a sample split of 300--1500$\,$mg. Pyritized Fe (Fe~py~) was derived stochiometrically from the weight of the liberated sulfide, captured as an Ag~2~S precipitate (Supplementary Table \@ref(tab:TablePropFe)).     
+In addition, sequential extraction procedures were applied to separate different sedimentary Fe and P phases. Firstly, the Fe speciation was used to reconstruct water column redox conditions, by combining sequential extractions, after ref. @Poulton2005, with iron-sulfide extractions, by chromium-reducible sulfur (CRS), after ref. @Canfield1986. Combined these methods yields six operationally-defined Fe fractions (Supplementary Table \@ref(tab:TablePropFe)). Non-sulfidized iron was liberated during the sequential extraction scheme applied to a sample split of ~70$\,$mg, with solutions specifically targeting ferrous carbonates (Fe~carb~), Fe (oxyhydr)oxides (Fe~ox~; such as, ferrihydrite, lepidocrocite, goethite and hematite) and magnetite (Fe~mag~). A further iron reservoir (termed 'poorly reactive Fe'; or Fe~PR~) was solubilized by boiling a sample split with 12$\,$N HCl [@Raiswell1994]. By substracting Fe~HR~ (not including pyrite, which is not extracted by a boiling HCl extraction, after ref. @Raiswell1994) from Fe~PR~, the fraction of iron contained in less reactive sheet silicate minerals (termed ‘poorly reactive sheet silicate Fe’; or Fe~PRS~) was obtained[@Raiswell1996; @Raiswell1998]. This iron phase is only poorly reactive to dissolved sulfide[@Raiswell1996], on a long timescale of 10^5^--10^6^$\,$y. However, Fe~HR~ is commonly transferred to the Fe~PRS~ pool during diagenesis under Fe reducing conditions in the absence of significant dissolved sulfide (see Supplementary Section \@ref(dia) and the main text). The iron content of the various extractions was obtained by Atomic Absorption Spectrometry (AAS; Thermo Scientific, iCE 3000 Series). The CRS method solubilized metal sulfides (among which iron sulfides are by far the dominant contributor) from a sample split of 300--1500$\,$mg. Pyritized Fe (Fe~py~) was derived stochiometrically from the weight of the liberated sulfide, captured as an Ag~2~S precipitate (Supplementary Table \@ref(tab:TablePropFe)).     
 
 
 ```{r TablePropFe, results='asis'}
@@ -1409,7 +1448,6 @@ knitr::kable(schemeP,  booktabs = TRUE,
 ```
 
 
-
 ```{r Phos , results='asis', include=FALSE}
 
 #-------------------------------------------------------------------------------
@@ -1422,41 +1460,18 @@ knitr::kable(sum.QC.P, digits = 4, row.names = FALSE, booktabs = TRUE,
 ```
 
 
-
-```{r Tabled13C , results='asis', include=FALSE}
-
-#----------------------------------------------------------------------------------------
-# tables of summary statistics standards for C isotope analysis
-#----------------------------------------------------------------------------------------
-
-knitr::kable(sum_stat_d13C, digits = 1, booktabs = TRUE,
-  caption = "Summary statistics $\\delta$^13^C~org~ of reference materials, excluding first and last batch of the sequence.")
-
-```
-
-
-
-
-```{r Tabled34S , results='asis', include=FALSE}
-
-#----------------------------------------------------------------------------------------
-# tables of summary statistics standards for S isotope analysis
-#----------------------------------------------------------------------------------------
-
-knitr::kable(sum_stat_d34S, digits = 1, booktabs = TRUE,
-  caption = "Summary statistics $\\delta$^34^S~CRS~ of reference materials, excluding first and last batch of the sequence")
-
-
-```
-
 ## Carbon and sulfur isotope analysis
+
   Carbonate was removed from the powdered rock samples by dissolution with 2 M HCl. The residues were repeatedly washed with MilliQ water^TM^and dried at 40$\,$°C. The de-carbonated samples were then analyzed for total organic carbon (TOC = C~org~) content and associated carbon isotopic composition using an Elementar Pyrocube elemental analyser linked to an Isoprime mass spectrometer.
+  
   The acid washed sample powder was weighed into a tin capsule and combusted at 1150$\,$°C in the presence of pure oxygen (N5.0) injected into a stream of helium (CP grade). Complete oxidation of resulting gases was achieved by passing them through tungstic oxide heated to 1150$\,$°C. Water and excess oxygen were removed from the gas stream by Sicapent and fine copper wires heated to 850$\,$°C respectively. N~2~ passes through the system unchecked, whilst CO~2~ and SO~2~ are removed and reinjected into the gas stream using temperature controlled adsorption-desorption columns. The $\delta$^13^C~org~ of the sample is calculated from the integrated mass 44, 45 and 46 signals from the pulse of sample CO~2~ compared to that of an independently introduced pulse of reference gas (CP grade). Carbon isotope analyses were calibrated with in-house C4-sucrose and urea standards assigned values of -11.93$\,$‰ and -46.83$\,$‰ respectively via calibration with the international standards (assigned values with respect to VPDB in brackets), LSVEC (-46.48$\,$‰), CH7 (-31.83$\,$‰), CH6 (-10.45$\,$‰), and CO-1 (+2.48$\,$‰).The analytical precision of the carbon isotope measurements was checked with a C-3 internal lab standard and yielded a value of 0.05$\,$‰ (2SD). TOC values were derived from the combined area of all three mass traces and calibrated using the known weight$\,$% C of of the C4 sucrose standard. The reproducibility of these analyses with similar samples from previous runs gives RSDs for in-house standard materials of ~10$\,$%. TOC values were corrected for weight-loss during acid digestion.
+  
   The Pyrocube was configured in the same way as described above for carbon isotope analysis. The $\delta$^34^S was derived from the integrated mass 64 and 66 signals of the sample gas compared to a pulse of independently introduced reference gas, and was calibrated to the international V-CDT scale using an lab-internal barium sulfate standard derived from seawater (SWS-3) which has been analysed against the international standards (assigned VCDT value in brackets), NBS-127 (+20.30$\,$‰), NBS-123 (+17.01$\,$‰), IAEA S-1 (-0.30$\,$‰) and IAEA S-3 (-32.06$\,$‰). The analytical precision was checked with an internal suite of reference materials and barium sulfate standard and yielded a value of 0.9$\,$‰ (2SD) or better.
 
 ## Mineralogical analysis
 
 A subset of samples from both sites were prepared for a mineralogical investigation by mounting rock fragments in an epoxy resin. The mounted samples were subsequently ground, polished and carbon coated. The mineralogical analysis was performed with a Quanta-650F electron microscope from Fisher Thermo Scientific (at Shell Global Solutions International B.V.) was used, which is equipped with a FEG tip for stable electron emission and with two Bruker XFlash EDX detectors, thereby allowing for high count rates. The application: MAPS Mineralogy, records the backscattered electron (BSE) image and the EDX data at high resolution, thereafter the Nanomin TM application translates this data into a detailed mineral map. 
+
 
 ```{r eval=FALSE}
 
@@ -1533,6 +1548,7 @@ grid.draw(tg)
 dev.off()
 
 ```              
+         
               
 ```{r FigPetro, fig.cap = "Microscale mineralogical and elemental variations mapped for A, C, E) Deltadalen at 95.9$\\,$m depth, and B, D, F) Festningen 1.6$\\,$m above the base of the Vardebukta Formation. Note, that the fine sand-sized clast of Deltadalen are composed of quartz (E) and apatite shell fragments (C; likely belonging to the inarticulate brachiopods) with porespaces occupied by glauconite and authigenic apatite infillings (C). Clasts of Festningen are clay-sized, and, although, P is detected with EDS (B), P bearing minerals could not be identified (D). The mineral assemblage is dominated by dolomite, ankerite  and  sheet silicates (D, F).", out.width="200%"}
 
@@ -1542,8 +1558,11 @@ knitr::include_graphics('figures/SuppFig4.tiff')
 
 
 # Supplementary Results and Discussion
+
 ## Palaeontological results
+
 ### Body fossils
+
 Benthic macrofaunal communities were investigated at both Festningen and Deltadalen (including Lusitaniadalen): at Festningen benthic fossils were only observed in laminated shales ~8$\,$m above the base of the Vardebukta Formation, which included an assemblage of bivalves including *Claraia kilenensis* and *C. radialis*[@Foster2015]. At the Deltadalen and Lusitaniadalen sections, the glauconitic sandstones below the mass extinction horizon contain a monospecific assemblage of the inarticulate brachiopod *Lingularia freboldi*, and the first concretionary horizon above the extinction horizon contains an assemblage of *Lingularia* cf. *yini* and abundant sponge spicules[@Foster2015]. Furthermore, two concretionary horizons at 11.9 and 12.6$\,$m yield a diverse benthic fauna including bivalves, gastropods, microconchids, inarticulate brachiopods, sponges, and foraminifera[@Foster2017]. 
 
 Within this fauna there are a large proportion of larval shells, which reveal the ontogenetic development of the recorded species. The larval stages were studied using an SEM [Ref @Foster2017] and for many of the bivalve species it was observed that they had a small prodissoconch I and a relatively large prodissoconch II (Fig. \@ref(fig:FigFos)B), which indicates a planktotrophic larval stage[@Hautmann2005]. In addition, some of the dominant gastropod larvae, *Warthia* and *Pseudozygolpleuridae*, have also been described as having planktotrophic larvae[@Fryda1999; @Mapes2009]. Extant inarticulate brachiopods, such as *Lingula*, are also observed to have planktotrophic larvae[@Yatsu1902; @Ashworth1915], which are morphologically similar to modern plantktotrophic inarticulate brachiopods *Lingula anatina* and *Discinisca* (Fig. \@ref(fig:FigFos)B). 
@@ -1558,11 +1577,13 @@ knitr::include_graphics('figures/SuppFig5.tiff')
 
 It has also been shown that the size of the lophophore in Permian--Triassic lingulids can be reconstructed by measuring the size of the lophophoral cavity, i.e., the distance between the anteriorior adductor on the ventral valve and the anterior obliques on the dorsal valve to the shell margin[@Peng2008; @Posenato2014]. Supplementary Fig. \@ref(fig:FigFosDraw) shows two specimens of lingulid lophophoral cavities measured in this study.  
 
+
 ```{r FigFosDraw, fig.cap="Outlines of A) Lingularia freboldi and B) L. yini showing the size of lophophoral cavity (arrow) and the central muscle scars."}
 
 knitr::include_graphics('figures/SuppFig6.jpg')
 
 ```
+
 
 ### Ichnology
 
@@ -1572,10 +1593,9 @@ In the nearby Lusitaniadalen section, which is approximately 4.5$\,$km northwest
 
 **Festningen**. At the Kapp Starostin Formation of Festningen, no primary sedimentary structures remain, and discrete trace fossils are visible at numerous levels, resulting in an ichnofabric index (ii) value of 5 (with the exception of bed Fe 68b = ii4)(Supplementary Fig. \@ref(fig:FigLithostrat)). Many levels are so thoroughly bioturbated that individual trace fossils cannot be identified, but we recognize common *Zoophycos* (bed Fe 66-68a and 74-87) as well as *Chondrites*, *Thalassinoides* and *Helminthoidea*, which are preserved in full relief and sometimes pyritized. Diplocraterion can occasionally be seen in concretions. The basal two meters of the Vardebukta Formation contains horizontal, small (1$\,$mm), mud filled burrows (ii4). Laminated strata (ii1) begin at bed Fe 91. A thin, wave-rippled horizon at 92.2$\,$m contains small (1$\,$mm), mud-filled *Arenicolites* burrows (ii2), above which bioturbation is lacking (ii1) for the remainder of the sequence. Thus, the extinction horizon at Festningen is marked by the abrupt loss of large-scale burrows such as *Zoophycos* that are common in pre-extinction strata. In contrast to Deltadalen, small-scale burrowing continues in the basal meters of the post-extinction strata, before petering out a little below the P-T boundary.
 
-
 ## Post-depositional alteration of Fe speciation signatures {#dia}  
 
-By using core material and carefully selecting outcrop material least affected by weathering, we attempted to create geochemical records representative of the primary depositional conditions for both sites. However, modern oxidative weathering may potentially affect reduced Fe-phases sampled in outcrop, such as iron sulfides and ferrous carbonates, which may be oxidized to Fe-(oxyhydr)oxides. While such weathering would skew the partitioning of Fe among the different phases, it does not alter the total Fe~HR~ pool. Furthermore, the appreciable amounts of pyrite found in both outcrop and core materials demonstrates that oxidative weathering was negligible. In the most extreme case, complete oxidation of iron sulfides to iron oxides could create a "false signal" of ferruginous conditions. However, the ferruginous interval of the Festningen locality is rich in magnetite and ferrous carbonates, which precludes the development of a false ferruginous signal (Fig. 1). 
+By using core material and carefully selecting outcrop material least affected by weathering, we attempted to create geochemical records representative of the primary depositional conditions for both sites. However, modern oxidative weathering may potentially affect reduced Fe-phases sampled in outcrop, such as iron sulfides and ferrous carbonates, which may be oxidized to Fe (oxyhydr)oxides. While such weathering would skew the partitioning of Fe among the different phases, it does not alter the total Fe~HR~ pool. Furthermore, the appreciable amounts of pyrite found in both outcrop and core materials demonstrates that oxidative weathering was negligible. In the most extreme case, complete oxidation of iron sulfides to iron oxides could create a "false signal" of ferruginous conditions. However, the ferruginous interval of the Festningen locality is rich in magnetite and ferrous carbonates, which precludes the development of a false ferruginous signal (Fig. 1). 
 
 Although the ‘poorly reactive sheet silicate Fe’ (Fe~PRS~) is generally of less importance in establishing ancient redox conditions, it is a frequently observed phenomenon that Fe~HR~ is channelled into Fe~PRS~ pool in ancient rock samples, particularly where TOC is abundant and  the supply of Fe~HR~ minerals overwhelms the availability of sulfate to fuel enough sulfide production during early diagenesis to pyritise the majority of the Fe~HR~ pool supplied to the sediment[@Poulton2010; @Poulton2011]. Such conversion of Fe~HR~ is associated with the post-depositional formation of iron-containing phyllosilicate minerals (e.g. glauconite as present at both sites), thereby transforming a fraction of the Fe~HR~ to these less-reactive phases. This option can be tested by evaluating Fe~tot~/Al (Supplementary Fig \@ref(fig:FigDia)), whereby enrichments over the average shale value are still preserved irrespective of diagenetically-driven transformations between different Fe pools[@Lyons2006; @Poulton2010; @Poulton2011]. This approach allowed us to define a primary baseline Fe~PRS~/Fe~tot~ ratio for each site, which represents the ratio at times when a high degree of glauconite formation was not apparent (Supplementary Fig \@ref(fig:FigDia)). Using this approach, we were able to apply a correction to samples with high glauconite (which is sourced from the original Fe~HR~ pool), to estimate the original Fe~HR~ concentration of the deposited sediment (thereby giving corrected Fe speciation ratios denoted by Fe~HR~/Fe~tot~\* and Fe~py~/Fe~HR~\*), whereby excess Fe~PRS~ = (measured Fe~PRS~/Fe~tot~  $\minus$ baseline Fe~PRS~/Fe~tot~) $\times$ Fe~tot~[@Doyle2018].
 
@@ -1587,9 +1607,9 @@ Although the ‘poorly reactive sheet silicate Fe’ (Fe~PRS~) is generally of l
 # global theme settings
 theme_set(theme_classic())
 theme_replace(plot.background = element_rect(fill = "transparent", 
-                                               color = NA),
+                                             color = NA),
               panel.background = element_rect(fill = "transparent", 
-                                               color = NA),
+                                              color = NA),
               legend.background = element_rect(fill = "transparent", 
                                                color = NA),
               strip.background = element_rect(color = NA, 
@@ -1607,7 +1627,9 @@ plot.els$blank <- list(
                           axis.text.x = element_text(size = 6, color="white"),
                           axis.title.x = element_text(size = 7, color="white"),
                           axis.ticks.x = element_line(color="white"),
-                          axis.line.x = element_line(color="white")))
+                          axis.line.x = element_line(color="white")
+                          )
+                        )
 
 # normal plots theme elements
 plot.els$norm <- list(  
@@ -1618,42 +1640,44 @@ plot.els$norm <- list(
                         axis.line.y = element_blank(),
                         axis.ticks.y = element_blank(),
                         strip.text = element_text(size = 7),
-                        legend.position = "none"))
+                        legend.position = "none"
+                        )
+                       )
 
 
 # iron background ranges for plotting
-plot.els$FeAl <- list(data.frame(section = c("Festningen", "Deltadalen")) %>% 
-                        as_tibble() %>% 
-                        mutate(phase = "Fe[tot]/Al" , xmin = 0.44,  xmax = 0.66, 
-                               mean =  ls.Chem$PAAS %>% 
-                                       filter(phase == "Fe[tot]/Al") %>% 
-                                       pull("value")
-                                ),
-                      data.frame(section = "Festningen", 
-                                 phase = plot.els$PRS_fest$phase,
-                                 xmin = plot.els$PRS_fest$avg - 
-                                        plot.els$PRS_fest$sd,
-                                 xmax = plot.els$PRS_fest$avg + 
-                                        plot.els$PRS_fest$sd,
-                                 mean = plot.els$PRS_fest$avg),
-                      data.frame(section = "Deltadalen", 
-                                 phase = plot.els$PRS_dd$phase,
-                                 xmin = plot.els$PRS_dd$avg - 
-                                        plot.els$PRS_dd$sd,
-                                 xmax = plot.els$PRS_dd$avg + 
-                                        plot.els$PRS_dd$sd,
-                                 mean = plot.els$PRS_dd$avg)) %>% 
-                        reduce(. , bind_rows) %>% 
-                          gather(. , "key", "value", -c(section, 
-                                                      phase)) %>% 
+plot.els$FeAl <- list(tibble(section = c("Festningen", "Deltadalen"), 
+                             phase = "Fe[tot]/Al" , 
+                             xmin = 0.44,  
+                             xmax = 0.66, 
+                             mean = 0.55
+                            ),
+                      tibble(section = "Festningen", 
+                             phase = plot.els$PRS_fest$phase,
+                             xmin = plot.els$PRS_fest$avg - 
+                                    plot.els$PRS_fest$sd,
+                             xmax = plot.els$PRS_fest$avg + 
+                                    plot.els$PRS_fest$sd,
+                             mean = plot.els$PRS_fest$avg
+                             ),
+                      tibble(section = "Deltadalen", 
+                             phase = plot.els$PRS_dd$phase,
+                             xmin = plot.els$PRS_dd$avg - 
+                                    plot.els$PRS_dd$sd,
+                             xmax = plot.els$PRS_dd$avg + 
+                                     plot.els$PRS_dd$sd,
+                             mean = plot.els$PRS_dd$avg
+                             )
+                      ) %>% 
+                    reduce(. , bind_rows) %>% 
+                      gather(. , "key", "value", -c(section, phase)) %>% 
                            mutate(alpha_f = if_else(key == "mean", 2, 1)) %>% 
-                           mutate(phase = 
-                                    factor(phase, 
-                                           levels = c("Fe[tot]/Al", 
-                                                      "Fe[PRS]/Fe[tot]"), 
-                                  ordered = TRUE
+                           mutate(phase = factor(phase, 
+                                                 levels = c("Fe[tot]/Al", 
+                                                            "Fe[PRS]/Fe[tot]"), 
+                                                 ordered = TRUE
+                                                 )
                                   )
-                                )
 
 # relevant stratigraphic horizons for common plot
 # Festningen
@@ -1672,10 +1696,11 @@ plot.els$PTX_hor_d <-list(geom_hline(yintercept = 84, color = "darkgrey"),
 
 # data selection, ordering and labelling
 plot.1 <- all.CD.long %>% 
-          filter(section == "Festningen" | section == "Deltadalen") %>% 
-          filter(phase == "Fe_Al" | phase == "PRS_FeT" | phase == "DET_P") %>% 
-          mutate(phase = factor(
-                            case_when(
+            filter(phase == "Fe_Al" | 
+                   phase == "PRS_FeT" |
+                   phase == "DET_P") %>% 
+            mutate(phase = factor(
+                             case_when(
                                   phase ==  "Fe_Al" ~  "Fe[tot]/Al",
                                   phase ==  "PRS_FeT" ~ "Fe[PRS]/Fe[tot]",
                                   phase ==  "DET_P" ~ "P[det]/P[tot]"
@@ -1683,8 +1708,9 @@ plot.1 <- all.CD.long %>%
                              levels = c("Fe[tot]/Al", "Fe[PRS]/Fe[tot]", 
                                         "P[det]/P[tot]"), 
                              ordered = TRUE
-                              )
-                 )
+                                  )
+                   )
+
 # range set by geom_blank to create equal x range for facets for both profiles          
 range.1 <- plot.1 %>% 
            group_by(phase) %>% 
@@ -1985,36 +2011,38 @@ save(plot.els,    # plot elements
 
 ```
 
+
 ## Post-depositional alteration of P speciation signatures
 
 Post-depositional processes may also impact on the speciation of P phases. Indeed, early diagenetic phase transformations are a crucial aspect of sedimentary P retention that provide insight into redox controlled P cycling (see main text). However, there is also the potential for late stage diagenetic recrystallization of original authigenic apatite, leading to its extraction (and hence over-estimation) as part of the P~det~ pool. It is evident from Supplementary Fig \@ref(fig:FigDia) that relative enrichments in P~det~ occur at some horizons, but these horizons specifically coincide with enrichments in glauconite, suggesting that the sediments have not been universally affected by significant recrystallisation of authigenic P. The horizons that contain high P~det~ are also enriched in total P, and the speciation characteristics imply that Fe (oxyhydr)oxide minerals were likely a primary source of this P to the sediment (Supplementary Fig \@ref(fig:FigPspec)). Given these considerations, it appears highly likely that after delivery to the sediment in association with Fe (oxyhydr)oxide minerals, the re-working of these minerals to glauconite resulted in sequestration of a fraction of released P~Fe~ in association with glauconite (and possibly also some recrystallization of P~aut~ to apatite). Fe(III)-rich phyllosillicates and clays (e.g., mica and smectite groups, among which glauconite) are known to have a phosphate adsorption capacity, which relates to constituent Fe(III) within interlayer spaces and iron-oxide coating of the particle surface [@Ruttenberg1992; @Borgnino2009]. These inorganic P phases are likely to have been liberated during step 1-c of the sequential extraction protocol (Supplementary Table \@ref(tab:TablePropP))[@Ruttenberg1992].   
 
 Therefore, the high P content of the glauconite-rich horizons is consistent with an elevated weathering influx of reactive P from the continents, combined with an effective retention mechanism in the sediment, rather than high primary P~det~ fluxes. However, even if our P~det~ measurements are representative of primary P~det~ inputs to the sediment, the enrichments in P~Fe~ and P~aut~ observed across these horizons still supports a high weathering influx of reactive P. Furthermore, our conclusions in terms of sedimentary P recycling are unaffected by possible transfer of reactive P to P~det~ in glauconite-rich horizons, since our calculated C~org~/P~reac~ ratios would be even lower than the Redfield ratio if original P~reac~ contents were underestimated (see main text). Phosphatic shell fragments occur in the glauconite-rich beds of Deltadalen, but are absent from the glauconite-rich unit of Festningen (Supplementary Fig \@ref(fig:FigPetro)), so while phosphatic shell fragments likely comprises a small portion of the P~aut~ pool, and might have skewed C~org~/P~reac~ ratios again to higher values, this source of P can be discounted for Festningen. Hence, CFA and Fe(III)-rich sheet sillicates (as P~aut~ and P~det~) seems to be the quantitatively most important sinks for P for this sedimentary environment.  
 
+
 ```{r FigPspec, anchor="figure", fig.width = 8 , fig.height = 8 , fig.cap = "Stratigraphic plots of P phases of Festningen and Deltadalen. Note that P~mag~ and P~Fe-ox~ have been lumped in P~Fe~."}
 
-# change Porg to ug/g units
-all.CD.long <- all.CD.long %>% mutate(value = if_else(phase == "P_org", 
-                                                      value * 10,
-                                                      value)
-                                      )
+# change Porg to mg/g units
+all.CD.long <- all.CD.long %>% 
+                  mutate(value = if_else(phase == "P_org", 
+                                         value * 10,
+                                         value))
 
 # data selection, ordering and labelling
 plot.2 <- all.CD.long %>% 
-          filter(section == "Festningen" | section == "Deltadalen") %>% 
-          filter(phase == "P_aut" | phase == "P_Fe" | phase == "P_det" |  
-                 phase == "P_org") %>% 
-          mutate(phase = factor(
-                            case_when(
-                                  phase ==  "P_aut" ~  "P[aut]",
-                                  phase ==  "P_Fe" ~ "P[Fe]",
-                                  phase ==  "P_det" ~ "P[det]",
-                                  phase ==  "P_org" ~ "P[org]"
-                                     ),
-                             levels = c("P[aut]", "P[Fe]", "P[det]", "P[org]"), 
-                             ordered = TRUE
-                              )
-                 )
+            filter(phase == "P_aut" | 
+                   phase == "P_Fe" | 
+                   phase == "P_det" |  
+                   phase == "P_org") %>% 
+            mutate(phase = factor(phase,
+                                  levels = c("P_aut", "P_Fe", "P_det", "P_org"), 
+                                  labels = c(bquote(P[aut]~"(% wt.)"),
+                                             bquote(P[Fe]~"(% wt.)"),
+                                             bquote(P[det]~"(% wt.)"),
+                                             bquote(P[org]~"(mg/g)")
+                                            ),
+                                  ordered = TRUE
+                                  )
+                    )
 
 # range set by geom blank to create equal x ranges for facets from different 
 # sections          
