@@ -566,21 +566,6 @@ AbCalib <- function(Absorb, C_lab, Calib){
 
 }
 
-# for(i in 1:length(Absorb)){
-# 
-# TA <- c(TA, unname(((lm(ppm~A,
-#                          Calib[[which(names(Calib) %in%
-#                                          C_lab[i])]]))$coefficients)[2] *
-#  Absorb[i] +
-# ((lm(ppm~A, Calib[[which(names(Calib) %in% C_lab[i])]]))$coefficients)[1]))
-# 
-#  }
-#  
-# TA[which(TA < 0)] <- 0
-#   
-# return(TA)
-# }
-
 # P spec from photospectrometer conversion to rock sample concentration  
 all.P <- all.P %>% 
             rowwise() %>% 
