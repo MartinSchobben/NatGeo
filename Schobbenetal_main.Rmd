@@ -3,8 +3,8 @@ output:
   bookdown::word_document2:
     fig_caption: true
     pandoc_args: [
-      "--csl", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/abbreviations.json",
-       "--reference-doc", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/word-style-ref1.docx"
+      "--csl", ".../NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", ".../NatGeo/common/abbreviations.json",
+       "--reference-doc", ".../NatGeo/common/word-style-ref1.docx"
        ]
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
 author: 
@@ -75,7 +75,7 @@ rref<- rref %>%
   enframe() %>% 
   mutate(value = "@rversion")
 
-data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/"
+data.path <- ".../NatGeo/"
 
 # load data
 load(paste0(data.path, "datafiles/CD_data.Rdata")) 
