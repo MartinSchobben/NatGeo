@@ -470,9 +470,9 @@ all.d34S <- bind_rows(d34S_fest %>%
 
 EWeight <- function(Output, Output.unit = "ppm", Volume, Weight){ 
                         
-                        if(Output.unit == "ppm"){unit <- 10^-4}
-                        if(Output.unit == "ppb"){unit <- 10^-7}
-                        if(Output.unit == "ppt"){unit <- 10^-10}
+                        if (Output.unit == "ppm"){unit <- 10^-4}
+                        if (Output.unit == "ppb"){unit <- 10^-7}
+                        if (Output.unit == "ppt"){unit <- 10^-10}
                                                           
                       (Output * unit * Volume) / Weight 
 }
@@ -648,16 +648,16 @@ all.TD <- all.TD %>%
                                      )
                    ) %>% 
             rowwise() %>% 
-# calculating actual concentration,converting units to ppm for TE (ppb for Re)
+# calculating actual concentration, converting units to ppm for TE (ppb for Re)
             mutate(value = case_when(Output.unit == "ppm"~ 
                                      EWeight(value, Output.unit, 250, 
                                              weight_gram),
                                      Output.unit == "ppb" ~
                                      EWeight(value, Output.unit, 250, 
-                                             weight_gram)*10^4,
+                                             weight_gram) * 10^4,
                                      Output.unit == "ppt" ~
                                      EWeight(value, Output.unit, 250, 
-                                            weight_gram)*10^7
+                                            weight_gram) * 10^7
                                     )
                    ) %>% 
           ungroup() %>% 
@@ -698,7 +698,7 @@ all.TD <- all.TD %>%
 
 # Geological setting
 
-The Svalbard island group is situated between 74 and 81$\,$°N on the northwestern part of the Barents Shelf (Supplementary Fig \@ref(fig:FigGeograph)). During Permian time the area was part of an extensive shelf on the northwestern margin of Pangaea situated at a palaeolatitude of ~40--45$\,$°N (Supplementary Fig \@ref(fig:FigPaleoGeo)). A fold-and-thrust belt, ranging over more than 300$\,$km, exposes Palaeozoic, Mesozoic and Cenozoic strata along the west coast of the main island (Spitsbergen) from the Brøgger peninsula in the North to the Sørkapp in the southernmost tip. The Festningen site (78.09$\,$°N, 13.88\,$°$E) on  the southern entrance of the Isfjorden (Western Nordenskiöld Land) is an easily accessible and frequently studied stratigraphic profile. At this site strata dips at a ~45$\,$° angle in a eastward direction as part of the short limb of a NNW--SSE-striking assymetric syncline [@Harland1997; @Grasby2015a]. The coastal cliffs of the Festningen site extend in an E-W direction providing an easy accessible opportunity to traverse the strata. A second P--Tr stratigraphic sequence at Deltadalen (78.27$\,$°N, 16.88$\,$°E) was drilled south of the coast of the Sassenfjorden/Tempelfjorden. Here Permian and Triassic strata are relatively flat-lying with only minor folds and thrusts[@Mork1999].  
+The Svalbard island group is situated between 74 and 81$\,$°N on the northwestern part of the Barents Shelf (Supplementary Fig \@ref(fig:FigGeograph)). During Permian time the area was part of an extensive shelf on the northwestern margin of Pangaea situated at a palaeolatitude of ~40--45$\,$°N (Supplementary Fig \@ref(fig:FigPaleoGeo)). A fold-and-thrust belt, ranging over more than 300$\,$km, exposes Palaeozoic, Mesozoic and Cenozoic strata along the west coast of the main island (Spitsbergen) from the Brøgger peninsula in the North to the Sørkapp in the southernmost tip. The Festningen site (78.09$\,$°N, 13.88\,$°$E) on  the southern entrance of the Isfjorden (Western Nordenskiöld Land) is an easily accessible and frequently studied stratigraphic profile. At this site strata dips at a ~45$\,$° angle in a eastward direction as part of the short limb of a NNW--SSE-striking asymmetric syncline [@Harland1997; @Grasby2015a]. The coastal cliffs of the Festningen site extend in an E-W direction providing an easy accessible opportunity to traverse the strata. A second P--Tr stratigraphic sequence at Deltadalen (78.27$\,$°N, 16.88$\,$°E) was drilled south of the coast of the Sassenfjorden/Tempelfjorden. Here Permian and Triassic strata are relatively flat-lying with only minor folds and thrusts[@Mork1999].  
 
 
 ```{r eval=FALSE}
@@ -763,7 +763,7 @@ knitr::include_graphics('figures/SuppFig1.png')
 
 ```{r eval=FALSE}
 
-#paleolatitude by creating a shapefile and cookycutting in Gplates
+# palaeolatitude by creating a shapefile and cookycutting in Gplates
 
 # create LIPS from Johansson et al 2018
 LIP <- readOGR(paste0(
@@ -1165,9 +1165,9 @@ all.CD.wide <- all.CD.wide %>%
 #-------------------------------------------
   
 all.CD.wide <- all.CD.wide %>%
-# iron over aluminium
+# iron over aluminium (%g/%g)   
                  mutate(Fe_Al = Fe / Al,
-# phosphorus over aluminium                      
+# phosphorus over aluminium (%g/%g)                      
                         P_Al = P / Al,
 # Mo over aluminium (ug/g)
                         Mo_Al = (Mo / Al) * 100,
@@ -1175,9 +1175,9 @@ all.CD.wide <- all.CD.wide %>%
                         U_Al  = (U / Al) * 100,
 # Re over aluminium  (ng/g) 
                         Re_Al = (Re / Al) * 100,
-# Re over Mo
+# Re over Mo (ug/ug)
                         Re_Mo = (Re / 1000) / Mo,
-# Mo over U 
+# Mo over U (ug/ug)
                         Mo_U  =  Mo / U)
 
 #-------------------------------------------
@@ -1553,7 +1553,7 @@ knitr::include_graphics('figures/SuppFig4.tiff')
 
 Benthic macrofaunal communities were investigated at both Festningen and Deltadalen (including Lusitaniadalen): at Festningen benthic fossils were only observed in laminated shales ~8$\,$m above the base of the Vardebukta Formation, which included an assemblage of bivalves including *Claraia kilenensis* and *C. radialis*[@Foster2015]. At the Deltadalen and Lusitaniadalen sections, the glauconitic sandstones below the mass extinction horizon contain a monospecific assemblage of the inarticulate brachiopod *Lingularia freboldi*, and the first concretionary horizon above the extinction horizon contains an assemblage of *Lingularia* cf. *yini* and abundant sponge spicules[@Foster2015]. Furthermore, two concretionary horizons at 11.9 and 12.6$\,$m yield a diverse benthic fauna including bivalves, gastropods, microconchids, inarticulate brachiopods, sponges, and foraminifera[@Foster2017]. 
 
-Within this fauna there are a large proportion of larval shells, which reveal the ontogenetic development of the recorded species. The larval stages were studied using an SEM [Ref @Foster2017] and for many of the bivalve species it was observed that they had a small prodissoconch I and a relatively large prodissoconch II (Fig. \@ref(fig:FigFos)B), which indicates a planktotrophic larval stage[@Hautmann2005]. In addition, some of the dominant gastropod larvae, *Warthia* and *Pseudozygolpleuridae*, have also been described as having planktotrophic larvae[@Fryda1999; @Mapes2009]. Extant inarticulate brachiopods, such as *Lingula*, are also observed to have planktotrophic larvae[@Yatsu1902; @Ashworth1915], which are morphologically similar to modern plantktotrophic inarticulate brachiopods *Lingula anatina* and *Discinisca* (Fig. \@ref(fig:FigFos)B). 
+Within this fauna there are a large proportion of larval shells, which reveal the ontogenetic development of the recorded species. The larval stages were studied using an SEM [Ref @Foster2017] and for many of the bivalve species it was observed that they had a small prodissoconch I and a relatively large prodissoconch II (Fig. \@ref(fig:FigFos)B), which indicates a planktotrophic larval stage[@Hautmann2005]. In addition, some of the dominant gastropod larvae, *Warthia* and *Pseudozygolpleuridae*, have also been described as having planktotrophic larvae[@Fryda1999; @Mapes2009]. Extant inarticulate brachiopods, such as *Lingula*, are also observed to have planktotrophic larvae[@Yatsu1902; @Ashworth1915], which are morphologically similar to modern planktotrophic inarticulate brachiopods *Lingula anatina* and *Discinisca* (Fig. \@ref(fig:FigFos)B). 
 
 
 ```{r FigFos, fig.cap="Early stage larval shell development of A) the brachiopod *Lingularia*, B) zoomed in on the initial shell formation stages, and C) *Nucinella taylori*, collected from a concretion at 12.6$\\,$m above the base of the Vikinghogda Formation. The red outline indicates prodissoconch I and the green outline indicates prodissoconch II.", out.height="150%"}
