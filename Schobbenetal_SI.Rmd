@@ -714,12 +714,12 @@ plot(shape2)
 
 common.CRS2 <-CRS(proj4string(shape2))
 
-# the coordinates for the Festningen site 15 E and 78 N
+# the coordinates for the Festningen 
 
 Fest.x <- 13.88 # longitude
 Fest.y <- 78.09 # latitude
 
-# the coordinates for the Festningen site 15 E and 78 N
+# the coordinates for the Deltadalen
 
 DD.x <- 16.88 # longitude
 DD.y <- 78.27 # latitude
@@ -905,7 +905,7 @@ ggsave(paste0(data.path, "figures/SuppFig2.tiff"), gg)
 
 # Lithostratigraphy and facies description
 
-The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with subordinate cherty mudstones, brachiopod and bryozoan-rich limestones and glauconitic sandstones[@Blomeier2013; @Dustira2013, @Bond2015, @Zuchuat]. Although substantial differences between the lithologies of outer Isfjorden of western-most Spitsbergen (Festningen) and inner Isfjorden of central Spitsbergen (Deltadalen), which has led to the proposal of two distinct members; the Hovtinden and Stensiöfjellet members, respectively, these units grade laterally into each other (Supplementary Fig \@ref(fig:FigLithostrat))[@Blomeier2013] and can therefore be correlated.  These two lithologies are interpreted to record shallow marine, high energy conditions in the inner Isfjorden (Stensiöfjellet Member)[@Zuchuat] whilst dark shales and cherts dominated in more distal, deeper locations (Hovtinden Member) that occurred in the outer Isfjorden[@Blomeier2013; @Bond2017]. Our study section at Festningen comprises the most expanded development of the Kapp Starostin Formation and has relatively thin beds of limestone indicating its distal, deep water development compared to the more easterly Deltadalen site. This sand-rich site was probably part of the inner sandy shelf that developed in north and east Spitsbergen in the Permian (Supplementary Fig \@ref(fig:FigGeograph)).
+The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with subordinate cherty shales, brachiopod and bryozoan-rich limestones and glauconitic sandstones[@Blomeier2013; @Dustira2013, @Bond2015, @Zuchuat]. Although substantial differences between the lithologies of outer Isfjorden of western-most Spitsbergen (Festningen) and inner Isfjorden of central Spitsbergen (Deltadalen), which has led to the proposal of two distinct members; the Hovtinden and Stensiöfjellet members, respectively, these units grade laterally into each other (Supplementary Fig \@ref(fig:FigLithostrat))[@Blomeier2013] and can therefore be correlated.  These two lithologies are interpreted to record shallow marine, high energy conditions in the inner Isfjorden (Stensiöfjellet Member)[@Zuchuat] whilst dark shales and cherts dominated in more distal, deeper locations (Hovtinden Member) that occurred in the outer Isfjorden[@Blomeier2013; @Bond2017]. Our study section at Festningen comprises the most expanded development of the Kapp Starostin Formation and has relatively thin beds of limestone indicating its distal, deep water development compared to the more easterly Deltadalen site. This sand-rich site was probably part of the inner sandy shelf that developed in north and east Spitsbergen in the Permian (Supplementary Fig \@ref(fig:FigGeograph)).
 
 
 ```{r  FigLithostrat,  anchor="figure", out.width="80%", fig.cap="Detailed lithology logs of the Deltadalen core and Festningen outcrop as well as a correlation scheme linking both sections. Location of the Permian--Triassic after ref @Zuchuat."}
@@ -1458,7 +1458,7 @@ knitr::kable(sum.QC.P, digits = 4, row.names = FALSE, booktabs = TRUE,
 
 ## Mineralogical analysis
 
-A subset of samples from both sites were prepared for a mineralogical investigation by mounting rock fragments in an epoxy resin. The mounted samples were subsequently ground, polished and carbon coated. The mineralogical analysis was performed with a Quanta-650F electron microscope from Fisher Thermo Scientific (at Shell Global Solutions International B.V.) was used, which is equipped with a FEG tip for stable electron emission and with two Bruker XFlash EDX detectors, thereby allowing for high count rates. The application: MAPS Mineralogy, records the backscattered electron (BSE) image and the EDX data at high resolution, thereafter the Nanomin TM application translates this data into a detailed mineral map. 
+A subset of samples from both sites was prepared for a mineralogical investigation by mounting rock fragments in an epoxy resin. The mounted samples were subsequently ground, polished and carbon coated. The mineralogical analysis was performed with a Quanta-650F electron microscope from Fisher Thermo Scientific (at Shell Global Solutions International B.V.) was used, which is equipped with a FEG tip for stable electron emission and with two Bruker XFlash EDX detectors, thereby allowing for high count rates. The application: MAPS Mineralogy, records the backscattered electron (BSE) image and the EDX data at high resolution, thereafter the Nanomin TM application translates this data into a detailed mineral map. 
 
 
 ```{r eval=FALSE}
@@ -1583,7 +1583,7 @@ In the nearby Lusitaniadalen section, which is approximately 4.5$\,$km northwest
 
 ## Post-depositional alteration of Fe speciation signatures {#dia}  
 
-By using core material and carefully selecting outcrop material least affected by weathering, we attempted to create geochemical records representative of the primary depositional conditions for both sites. However, modern oxidative weathering may potentially affect reduced Fe-phases sampled in outcrop, such as iron sulfides and ferrous carbonates, which may be oxidized to Fe (oxyhydr)oxides. While such weathering would skew the partitioning of Fe among the different phases, it does not alter the total Fe~HR~ pool. Furthermore, the appreciable amounts of pyrite found in both outcrop and core materials demonstrates that oxidative weathering was negligible. In the most extreme case, complete oxidation of iron sulfides to iron oxides could create a "false signal" of ferruginous conditions. However, the ferruginous interval of the Festningen locality is rich in magnetite and ferrous carbonates, which precludes the development of a false ferruginous signal (Fig. 1). 
+By using core material and carefully selecting outcrop material least affected by weathering, we attempted to create geochemical records representative of the primary depositional conditions for both sites. However, modern oxidative weathering may potentially affect reduced Fe-phases sampled in outcrop, such as iron sulfides and ferrous carbonates, which may be oxidized to Fe (oxyhydr)oxides. While such weathering would skew the partitioning of Fe among the different phases, it does not alter the total Fe~HR~ pool. Furthermore, the appreciable amounts of pyrite found in both outcrop and core materials demonstrate that oxidative weathering was negligible. In the most extreme case, complete oxidation of iron sulfides to iron oxides could create a "false signal" of ferruginous conditions. However, the ferruginous interval of the Festningen locality is rich in magnetite and ferrous carbonates, which precludes the development of a false ferruginous signal (Fig. 1). 
 
 Although the ‘poorly reactive sheet silicate Fe’ (Fe~PRS~) is generally of less importance in establishing ancient redox conditions, it is a frequently observed phenomenon that Fe~HR~ is channelled into Fe~PRS~ pool in ancient rock samples, particularly where TOC is abundant and  the supply of Fe~HR~ minerals overwhelms the availability of sulfate to fuel enough sulfide production during early diagenesis to pyritise the majority of the Fe~HR~ pool supplied to the sediment[@Poulton2010; @Poulton2011]. Such conversion of Fe~HR~ is associated with the post-depositional formation of iron-containing phyllosilicate minerals (e.g. glauconite as present at both sites), thereby transforming a fraction of the Fe~HR~ to these less-reactive phases. This option can be tested by evaluating Fe~tot~/Al (Supplementary Fig \@ref(fig:FigDia)), whereby enrichments over the average shale value are still preserved irrespective of diagenetically-driven transformations between different Fe pools[@Lyons2006; @Poulton2010; @Poulton2011]. This approach allowed us to define a primary baseline Fe~PRS~/Fe~tot~ ratio for each site, which represents the ratio at times when a high degree of glauconite formation was not apparent (Supplementary Fig \@ref(fig:FigDia)). Using this approach, we were able to apply a correction to samples with high glauconite (which is sourced from the original Fe~HR~ pool), to estimate the original Fe~HR~ concentration of the deposited sediment (thereby giving corrected Fe speciation ratios denoted by Fe~HR~/Fe~tot~\* and Fe~py~/Fe~HR~\*), whereby excess Fe~PRS~ = (measured Fe~PRS~/Fe~tot~  $\minus$ baseline Fe~PRS~/Fe~tot~) $\times$ Fe~tot~[@Doyle2018].
 
@@ -1680,7 +1680,7 @@ plot.els$PTX_hor_d <-list(geom_hline(yintercept = 84, color = "darkgrey"),
 ```
 
 
-```{r FigDia, anchor="figure", fig.width = 8 , fig.height = 4 , fig.cap = "Stratigraphic plots of Fe~tot~/Al, Fe~PRS~/Fe~tot~ and P~tot~/Al of the Festningen site and Deltadalen core. The static boundaries for in the Fe~tot~/Al and P~tot~/Al plots represent the average shale values [@Wedepohl1991; @Clarkson2014]. On the Fe~PRS~/Fe~tot~ the dashed line represent the site-specific background values (Deltadalen: 0.13 ± 0.04  and Festningen: 0.19 ± 0.09)."}
+```{r FigDia, anchor="figure", fig.width = 8 , fig.height = 4 , fig.cap = "Stratigraphic plots of Fe~tot~/Al, Fe~PRS~/Fe~tot~ and P~det~/P~tot~ of the Festningen site and Deltadalen core. The static boundary for the Fe~tot~/Al (mass ratio) represents the average shale value[@Wedepohl1991; @Clarkson2014]. On the Fe~PRS~/Fe~tot~ the dashed line represent the site-specific background values (Deltadalen: 0.13 ± 0.04  and Festningen: 0.19 ± 0.09)."}
 
 # data selection, ordering and labelling
 plot.1 <- all.CD.long %>% 
