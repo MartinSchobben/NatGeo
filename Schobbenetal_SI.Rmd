@@ -910,6 +910,7 @@ The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with s
 
 ```{r  FigLithostrat,  anchor="figure", out.width="80%", fig.cap="Detailed lithology logs of the Deltadalen core and Festningen outcrop as well as a correlation scheme linking both sections. Location of the Permian--Triassic after ref @Zuchuat."}
 
+# external figure
 knitr::include_graphics("figures/SuppFig3.png")
 
 ```
