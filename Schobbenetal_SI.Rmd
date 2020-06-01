@@ -3,8 +3,8 @@ output:
   bookdown::word_document2:
     fig_caption: true
     pandoc_args: [
-      "--csl", ".../NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", ".../NatGeo/common/abbreviations.json",
-       "--reference-doc", ".../NatGeo/common/word-style-ref2.docx"
+      "--csl", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/abbreviations.json",
+       "--reference-doc", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/word-style-ref2.docx"
        ]
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
 subtitle: "Supplementary Information file"
@@ -79,7 +79,7 @@ rref<- rref %>%
   enframe() %>% 
   mutate(value = "@rversion")
 
-data.path <- ".../NatGeo/"
+data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/"
 
 ```
 
@@ -608,6 +608,10 @@ all.P <- all.ICP.P %>%
            ungroup() %>%
            select(gl.ID, phase, method, value, unit)
 
+# turn negative value into zeros (these are minor discrepancies due 
+# to the calibration)
+all.P <- all.P %>% 
+           mutate(value = if_else(value < 0, 0, value))
 #---------------------------             
 # QCs P spec
 #---------------------------
@@ -698,7 +702,7 @@ all.TD <- all.TD %>%
 
 # Geological setting
 
-The Svalbard island group is situated between 74 and 81$\,$°N on the northwestern part of the Barents Shelf (Supplementary Fig \@ref(fig:FigGeograph)). During Permian time the area was part of an extensive shelf on the northwestern margin of Pangaea situated at a palaeolatitude of ~40--45$\,$°N (Supplementary Fig \@ref(fig:FigPaleoGeo)). A fold-and-thrust belt, ranging over more than 300$\,$km, exposes Palaeozoic, Mesozoic and Cenozoic strata along the west coast of the main island (Spitsbergen) from the Brøgger peninsula in the North to the Sørkapp in the southernmost tip. The Festningen site (78.09$\,$°N, 13.88\,$°$E) on  the southern entrance of the Isfjorden (Western Nordenskiöld Land) is an easily accessible and frequently studied stratigraphic profile. At this site strata dips at a ~45$\,$° angle in a eastward direction as part of the short limb of a NNW--SSE-striking asymmetric syncline [@Harland1997; @Grasby2015a]. The coastal cliffs of the Festningen site extend in an E-W direction providing an easy accessible opportunity to traverse the strata. A second P--Tr stratigraphic sequence at Deltadalen (78.27$\,$°N, 16.88$\,$°E) was drilled south of the coast of the Sassenfjorden/Tempelfjorden. Here Permian and Triassic strata are relatively flat-lying with only minor folds and thrusts[@Mork1999].  
+The Svalbard island group is situated between 74 and 81$\,$°N on the northwestern part of the Barents Shelf (Fig. 1). During Permian time the area was part of an extensive shelf on the northwestern margin of Pangaea situated at a palaeolatitude of ~40--45$\,$°N (Supplementary Fig \@ref(fig:FigPaleoGeo)). A fold-and-thrust belt, ranging over more than 300$\,$km, exposes Palaeozoic, Mesozoic and Cenozoic strata along the west coast of the main island (Spitsbergen) from the Brøgger peninsula in the North to the Sørkapp in the southernmost tip. The Festningen site (78.09$\,$°N, 13.88\,$°$E) on  the southern entrance of the Isfjorden (Western Nordenskiöld Land) is an easily accessible and frequently studied stratigraphic profile. At this site strata dips at a ~45$\,$° angle in a eastward direction as part of the short limb of a NNW--SSE-striking asymmetric syncline [@Harland1997; @Grasby2015a]. The coastal cliffs of the Festningen site extend in an E-W direction providing an easy accessible opportunity to traverse the strata. A second P--Tr stratigraphic sequence at Deltadalen (78.27$\,$°N, 16.88$\,$°E) was drilled south of the coast of the Sassenfjorden/Tempelfjorden. Here Permian and Triassic strata are relatively flat-lying with only minor folds and thrusts[@Mork1999].  
 
 
 ```{r eval=FALSE}
@@ -754,11 +758,7 @@ dev.off()
 ```
 
 
-```{r FigGeograph,  anchor="figure", fig.cap = "Geographical setting of the Festningen section (1) and Deltadalen core (2). Lithofacies of Spitsbergen after ref @Harland1997. Base map from GADM database (<https://gadm.org/>)"}
 
-knitr::include_graphics('figures/SuppFig1.png')
-
-```
 
 
 ```{r eval=FALSE}
@@ -898,7 +898,7 @@ gg <- gtable_add_grob(gg, text.6, 1, 1, z=Inf, name="PTr")
 grid.draw(gg)
 
 # save plots external
-ggsave(paste0(data.path, "figures/SuppFig2.tiff"), gg)
+ggsave(paste0(data.path, "figures/SuppFig1.tiff"), gg)
 
 ```
 
@@ -911,7 +911,7 @@ The Kapp Starostin Formation is dominated by biogenic cherts (spiculites) with s
 ```{r  FigLithostrat,  anchor="figure", out.width="80%", fig.cap="Detailed lithology logs of the Deltadalen core and Festningen outcrop as well as a correlation scheme linking both sections. Location of the Permian--Triassic after ref @Zuchuat."}
 
 # external figure
-knitr::include_graphics("figures/SuppFig3.png")
+knitr::include_graphics("figures/SuppFig2.png")
 
 ```
 
@@ -1469,7 +1469,7 @@ A subset of samples from both sites was prepared for a mineralogical investigati
 #----------------------------------------------------------------------------------------
 
 # save images
-tiff(paste0(data.path, "figures/SuppFig4.tiff"), 
+tiff(paste0(data.path, "figures/SuppFig3.tiff"), 
      height = 30, width = 20, unit = "cm", res = 300)
 
 # create gtable
@@ -1541,7 +1541,7 @@ dev.off()
               
 ```{r FigPetro, fig.cap = "Microscale mineralogical and elemental variations mapped for A, C, E) Deltadalen at 95.9$\\,$m depth, and B, D, F) Festningen 1.6$\\,$m above the base of the Vardebukta Formation. Note, that the fine sand-sized clast of Deltadalen are composed of quartz (E) and apatite shell fragments (C; likely belonging to the inarticulate brachiopods) with porespaces occupied by glauconite and authigenic apatite infillings (C). Clasts of Festningen are clay-sized, and, although, P is detected with EDS (B), P bearing minerals could not be identified (D). The mineral assemblage is dominated by dolomite, ankerite  and  sheet silicates (D, F).", out.width="200%"}
 
-knitr::include_graphics('figures/SuppFig4.tiff')
+knitr::include_graphics('figures/SuppFig3.tiff')
               
 ```
 
@@ -1559,7 +1559,7 @@ Within this fauna there are a large proportion of larval shells, which reveal th
 
 ```{r FigFos, fig.cap="Early stage larval shell development of A) the brachiopod *Lingularia*, B) zoomed in on the initial shell formation stages, and C) *Nucinella taylori*, collected from a concretion at 12.6$\\,$m above the base of the Vikinghogda Formation. The red outline indicates prodissoconch I and the green outline indicates prodissoconch II.", out.height="150%"}
 
-knitr::include_graphics('figures/SuppFig5.tiff')
+knitr::include_graphics('figures/SuppFig4.tiff')
 
 ```
 
@@ -1569,7 +1569,7 @@ It has also been shown that the size of the lophophore in Permian--Triassic ling
 
 ```{r FigFosDraw, fig.cap="Outlines of A) Lingularia freboldi and B) L. yini showing the size of lophophoral cavity (arrow) and the central muscle scars."}
 
-knitr::include_graphics('figures/SuppFig6.jpg')
+knitr::include_graphics('figures/SuppFig5.jpg')
 
 ```
 
@@ -1844,7 +1844,9 @@ for(i in seq_along(unique.types)){
                                                 col = "black"),
                                          fg_params = 
                                            list(rot = 90, 
-                                                fontsize = 6L)
+                                                fontsize = 6L,
+                                                col = "darkgrey",
+                                                fontface = "bold")
                                           )
                                         )
                    )
@@ -1940,8 +1942,10 @@ for(i in seq_along(unique.types)){
                                                       maxColorValue = 255),
                                                   col = "black"),
                                           fg_params = 
-                                            list(rot = 90, 
-                                                 fontsize = 6L)
+                                             list(rot = 90, 
+                                                fontsize = 6L,
+                                                col = "darkgrey",
+                                                fontface = "bold")
                                           )
                                          )
                   )
@@ -1983,7 +1987,7 @@ DD   <- cbind(pg.DD, ggplotGrob(plot.1.d_pr),  size = "first")
 str_plots <- grid.arrange(DD, fest, nrow = 1)
 
 # save plots external
-ggsave(paste0(data.path, "figures/SuppFig7.tiff"), 
+ggsave(paste0(data.path, "figures/SuppFig6.tiff"), 
               str_plots , height = 10, width = 20, unit = "cm")
 
 # external save of R elements for further usage in the main 
@@ -2091,7 +2095,7 @@ DD   <- cbind(pg.DD, ggplotGrob(plot.2.d_pr),  size = "first")
 str_plots <- grid.arrange(DD, fest, ncol = 1)
 
 # save plots external
-ggsave(paste0(data.path, "figures/SuppFig8.tiff"), 
+ggsave(paste0(data.path, "figures/SuppFig7.tiff"), 
               str_plots , height = 20, width = 20, unit = "cm")
 
 ```

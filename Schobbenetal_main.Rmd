@@ -3,14 +3,14 @@ output:
   bookdown::word_document2:
     fig_caption: true
     pandoc_args: [
-      "--csl", ".../NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", ".../NatGeo/common/abbreviations.json",
-       "--reference-doc", ".../NatGeo/common/word-style-ref1.docx"
+      "--csl", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/nature-geoscience.csl", "--citation-abbreviations", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/abbreviations.json",
+       "--reference-doc", "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/common/word-style-ref1.docx"
        ]
 title: "A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction "
 author: 
 - Martin Schobben^[School of Earth and Environment, University of Leeds, Leeds, LS2 9JT, UK] ^[Museum für Naturkunde, Leibniz Institute for Research on Evolution and Biodiversity, 10115 Berlin, Germany], William J. Foster^2^ ^[Universität Potsdam, Institute of Geosciences, Potsdam, Germany], Arve R.N. Sleveland^[Centre for Earth Evolution and Dynamics (CEED), Department of Earth Sciences, University of Oslo, P.O. box 1028, Blindern, 0315 Oslo, Norway], Valentin Zuchuat^4^, Henrik H. Svensen^4^, Sverre Planke^4^, David P.G. Bond^[School of Environmental Sciences, University of Hull, Hull, HU6 7RX, UK], Fons Marcelis^[Shell Global Solutions International B.V., Postbus 38000, 1030 BN Amsterdam, Netherlands], Robert J. Newton^1^, Paul B. Wignall^1^, Simon W. Poulton^1^
 abstract: "The global spread of marine anoxia has been proposed as a major driver of the end-Permian mass extinction---the most devastating biotic crisis of the Phanerozoic. However, the mechanism that drove large stretches of the ocean to an anoxic state is unclear. Here, we utilize a combined geochemical and palaeontological approach to show that, prior to the extinction, enhanced weathering driven by Siberian Traps volcanism increased the oceanic influx of phosphorus. This promoted increased primary productivity and thus the development of oxygen-depleted waters in proximal settings. However, bioavailable phosphorus was also efficiently sequestered in the sediment in association with iron minerals. This limited phosphorus recycling back to the water column and hence restricted the intensity and spatial extent of oxygen-depleted waters. A critical threshold was then crossed, whereby the collapse of vegetation on land immediately prior to the extinction horizon changed the weathering regime, leading to significantly enhanced redox-promoted remobilization of bioavailable phosphorus. This resulted in a positive productivity feedback that stimulated the spread of anoxic waters across large portions of the shelf. This model reconciles an apparent contradiction between the timing of enhanced weathering and the development of widespread ocean anoxia, which in turn, was a potent kill mechanism." 
-bibliography: library.bib
+bibliography: biblio.bib
 ---
 
 
@@ -31,12 +31,13 @@ knitr::opts_chunk$set(echo = FALSE,
 # by Michael
 
 # required packages
-packages <- c("tidyverse", # plotting, datawrangling
-              "gridExtra", # multiplot
-              "marelac",   # geochemical database plug-in
-              "gtable",    # multiplot
-              "bibtex",    # writing bibtex files
-              "grid",      # drawing
+packages <- c("tidyverse",    # plotting, datawrangling
+              "gridExtra",    # multiplot
+              "marelac",      # geochemical database plug-in
+              "gtable",       # multiplot
+              "bibtex",       # writing bibtex files
+              "grid",         # drawing
+              "RColorBrewer", # color palletes
               "png")    
 
 # load packages
@@ -75,7 +76,7 @@ rref<- rref %>%
   enframe() %>% 
   mutate(value = "@rversion")
 
-data.path <- ".../NatGeo/"
+data.path <- "/home/nicola/Documents/work/projects/Phosphor_project/report/spitsbergen/supplement/NatGeo/"
 
 # load data
 load(paste0(data.path, "datafiles/CD_data.Rdata")) 
@@ -100,6 +101,12 @@ load(paste0(data.path, "datafiles/CD_data.Rdata"))
   We investigated the Festningen and Deltadalen sequences (Svalbard), that were deposited on a shallow, open-marine shelf at the northern margin of Pangaea, facing the Boreal Sea and the Panthalassa Ocean beyond. The Kapp Starostin Formation at Festningen consists of dark, massive to bedded spiculitic chert (with minor shale) that records extensive biogenic silica production in a shelf setting[@Dustira2013]. The Kapp Starostin Formation is overlain by the shale-dominated Vardebukta Formation, and the formational contact marks the cessation of biogenic silica production. The end-Permian mass extinction is marked by a loss of intense bioturbation dominated by *Zoophycos*[@Dustira2013]. Shallow bioturbation, dominated by small *Planolites*, persists for ~3$\,$m above the formational contact, before disappearing[@Wignall1996]. 
   
   The Kapp Starostin Formation within the Deltadalen core comprises glauconitic, fine-grained sandstone with chert nodules and beds, and is interpreted to be a more proximal facies development of the unit compared to that at Festningen. This unit transitions into shaley strata towards the top, followed by a well-bedded siltstone, above which laminated shale constitutes the remainder of the sampled core. The extinction horizon is placed at the onset of the laminated shale, coincident with the disappearance of bioturbation somewhat above the base of the overlying Vikinghøgda Formation[@Nabbefeld2010c]. The basal, well-sorted sandstone of Deltadalen has been interpreted as accumulating above storm-weather wavebase[@Dustira2013; @Blomeier2013]. The P--Tr boundary is defined with the aid of $\delta$^13^C~org~ (Fig. \@ref(fig:FigStrat)) and the conodont marker species *Hindeodus parvus* (see Supplementary Information and Supplementary Figs 1-3).   
+  
+```{r FigGeograph,  anchor="figure", fig.cap = "Geographical setting of the Festningen section (1) and Deltadalen core (2). Lithofacies of Spitsbergen after ref @Harland1997. Base map from GADM database (<https://gadm.org/>)"}
+
+knitr::include_graphics('figures/Fig1.png')
+
+```  
 
 
 ```{r}
@@ -559,7 +566,7 @@ DD   <- cbind(pg.DD,
 str_plots <- grid.arrange(DD, fest, ncol = 1)
 
 # save plots external
-ggsave(paste0(data.path, "figures/Fig1.tiff"), 
+ggsave(paste0(data.path, "figures/Fig2.tiff"), 
        str_plots , height = 20, width = 23, unit = "cm")
 
 ```
@@ -656,14 +663,13 @@ plot.2.d_b <- plot.2.d +
                 xlab(expression(U[EF]))+
                 geom_line(data = MOU.df, aes(y = Mo_EF, 
                                              x = U_EF, 
-                                             group = key)) +
+                                             group = key),
+                          linetype = 2) +
                 coord_trans(x= 'log10',y = 'log10') +
                 scale_y_continuous(breaks = c(0.1,1, 10, 100)) +
                 scale_x_continuous(limits = c(0.1, max.range), 
-                                 breaks = c(0.1,1, 10)) +
-                theme(axis.ticks = element_blank(),
-                      axis.text.y = element_text(size=9,  color="white"),
-                      axis.title.y = element_text(size=10,  vjust = -3.5),
+                                   breaks = c(0.1,1, 10)) +
+                theme(axis.title.y = element_text(vjust = -2),
                       panel.background = element_rect(fill="#f0f0f0"))
 
 
@@ -774,7 +780,7 @@ for(i in seq_along(pg.Grobs)){
 
 cr_plots <- grid.arrange(plot.2.d_pr, pg, nrow = 1, widths = c(2/3, 1/3)) 
                   
-ggsave("figures/Fig2.tiff", cr_plots, height = 7, width = 20, unit = "cm")
+ggsave("figures/Fig3.tiff", cr_plots, height = 7, width = 20, unit = "cm")
 
 ```
 
@@ -923,9 +929,12 @@ redox.f <- spline(x = redox.f$height, y = redox.f$redox, n = 1000) %>%
                          color = "black") +
                 
                 scale_y_continuous(expand = expand_scale(mult = c(0,0))) +
-                scale_fill_gradient(name = NULL, high = "#132B43", 
-                                    low = "#56B1F7", breaks = c(0,1,2), 
-                                    labels=c("oxic","ferruginous", "euxinic"),  
+                scale_fill_gradient2(name = NULL, 
+                                    high = brewer.pal(3, "PuOr")[1], 
+                                    mid = brewer.pal(3, "PuOr")[2], 
+                                    low = brewer.pal(3, "PuOr")[3], 
+                                    breaks = c(0,1,2), 
+                                    labels = c("oxic","ferruginous","sulfidic"),   
                                     guide = guide_colorbar(
                                       direction = "horizontal", 
                                       label.position = "top", 
@@ -934,7 +943,9 @@ redox.f <- spline(x = redox.f$height, y = redox.f$redox, n = 1000) %>%
                                       ticks.colour = "black", 
                                       ticks.linewidth = 1, 
                                       frame.colour = "black", 
-                                      frame.linewidth = 1)) +
+                                      frame.linewidth = 1
+                                      )
+                                    ) +
                 facet_grid(cols = vars(section),  scales = "free", switch = "x", 
                             labeller = label_parsed) +
                 plot.els$blank +
@@ -1001,14 +1012,19 @@ redox.d <- spline(x = redox.d$height, y = redox.d$redox, n = 1000) %>%
                          xmax = 0.6,
                          fill = "transparent", 
                          color = "black") +
-                scale_fill_gradient(name = NULL, high = "#132B43", 
-                                    low = "#56B1F7", breaks = c(0,1,2), 
+                scale_fill_gradient2(name = NULL, 
+                                    high = brewer.pal(3, "PuOr")[1], 
+                                    mid = brewer.pal(3, "PuOr")[2], 
+                                    low = brewer.pal(3, "PuOr")[3], 
+                                    breaks = c(0,1,2), 
                                     labels = c("oxic","ferruginous","sulfidic"),  
                                     guide = guide_colorbar(
                                       direction = "horizontal", 
                                       label.position = "top", 
                                       label.theme = element_text(size = 6, 
-                                                                 angle = 45))) +
+                                                                 angle = 45)
+                                      )
+                                    ) +
                 scale_y_reverse(expand = expand_scale(mult = c(0,0))) +
                 facet_grid(cols = vars(section),  scales = "free", switch = "x", 
                             labeller = label_parsed) +
@@ -1036,7 +1052,7 @@ DD   <- cbind(pg.DD, ggplotGrob(plot.3.d_pr), r.d, size = "first")
 str_plots <- grid.arrange(DD, fest, nrow = 2)
 
 # save plots external
-ggsave(paste0(data.path, "figures/Fig3.tiff"), 
+ggsave(paste0(data.path, "figures/Fig4.tiff"), 
        str_plots , height = 14, width = 14, unit = "cm")
 
 ```
@@ -1057,7 +1073,7 @@ ggsave(paste0(data.path, "figures/Fig3.tiff"),
 
 ```{r FigConcept,  anchor="figure", fig.cap = "Conceptual model of the development of water column redox conditions. In the Late Permian, the inner shelf was dysoxic and large amounts of reactive P accumulated. During the end-Permian mass extinction euxinia developed on the inner shelf, whereas the outer shelf environment became dysoxic/ferruginous. Under these conditions, P was remobilized from the inner shelf, invigorating productivity (and thus oxygen depletion), and dissolved P was recycled to the outer shelf and initially deposited through uptake by Fe (oxyhydr)oxide particles settling on the seabed. After the extinction, euxinic conditions became more prevalent across the shelf, which was initiated and maintained by recycling of P."}
 
-knitr::include_graphics('figures/Fig4.png')
+knitr::include_graphics('figures/Fig5.png')
 
 ```
 
