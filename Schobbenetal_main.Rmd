@@ -24,7 +24,9 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       warning = FALSE, 
                       dpi = 300, 
-                      digits = 2)
+                      digits = 2,
+                      dev='CairoPDF',
+                      results='asis')
 
 # following code for loading and writing the bibtex references for the used 
 # packages is adapted from the blog post: //www.r-bloggers.com/bibliography-with-knitr-cite-your-references-and-packages/,
@@ -38,7 +40,9 @@ packages <- c("tidyverse",    # plotting, datawrangling
               "bibtex",       # writing bibtex files
               "grid",         # drawing
               "RColorBrewer", # color palletes
-              "png")    
+              "png",
+              "Cairo"         # for per mille sign rendering in figures
+              )    
 
 # load packages
 invisible(lapply(packages, library, character.only = TRUE))
@@ -86,7 +90,7 @@ load(paste0(data.path, "datafiles/CD_data.Rdata"))
 
   The Permian--Triassic (P--Tr) boundary (~251.9 million years ago[@Burgess2014]) record contains multiple signals suggestive of widespread marine anoxia, a kill mechanism widely implicated in the end-Permian mass extinction[@Wignall1996; @Cao2009; @Nabbefeld2010c; @Brennecka2011a; @Dustira2013; @Schobben2015]. The end-Permian crisis was the most dramatic turning-point in the evolution of post-Cambrian life, and as many as 81% of all marine species were lost[@Stanley2016]. Mechanisms for the globally pervasive development of oxygen-depleted oceans on timescales compatible with the duration of the extinction (~60$\,$ky[@Burgess2014]), include changes in ocean circulation[@Kiehl2005], decreased O~2~ solubility under globally rising temperatures[@Hotinski2001], and enhanced eutrophication resulting in respiratory O~2~ demand out-competing O~2~ replenishment through photosynthesis and ventilation[@Hotinski2001; @Meyer2008; @Algeo2010; @Shen2016]. In the latter case, recent studies have postulated that changes in the marine inventory of phosphorus (P)---the ultimate limiting nutrient for marine productivity on geological timescales[@Tyrrell1999]---was the main driver for eutrophication-induced oxygen depletion and ultimately the development of euxinic (H~2~S-rich) conditions in extensive regions of the global ocean[@Hotinski2001; @Meyer2008; @Shen2016].
   
-  During the peak of Siberian Traps volcanism, an increase in bioavailable phosphorus would be an expected consequence of increased continental weathering via both the dissolution of exposed rock (driven by CO~2~-induced warming, and SO~2~-induced acid rain), and the disintegration of rock by mechanical forces (driven by the hydrological cycle)[@Sephton2005; @Meyer2008; @Algeo2010; @Sun2018]. Indeed, a coeval change in both lithium (Li) concentrations and Li isotope ratios has been interpreted as a pre-extinction increase in weathering[@Sun2018]. Subsequently, a change in eruption style to intrusive basalt emplacement has been linked to halocarbon remobilization and exhalations leading to ozone layer depletion and consequent terrestrial plant extirpations by UV-B irradiance[@Visscher2004; @Burgess2017]. The effects of this intrusive volcanic phase on land-plant communities have therefore been related to reduced soil stability[@Sephton2005; @Algeo2010]. Combined with continued greenhouse-induced global warming, and associated changes in the hydrological cycle, this situation likely led to a weathering-limited denudation regime of increased soil erosion and physical weathering, thereby loading near-shore environments with a higher sediment influx and terrestrial organics[@Sephton2005; @Nabbefeld2010c; @Algeo2010; @Schobben2015]
+  During the peak of Siberian Traps volcanism, an increase in bioavailable phosphorus would be an expected consequence of increased continental weathering via both the dissolution of exposed rock (driven by CO~2~-induced warming, and SO~2~-induced acid rain), and the disintegration of rock by mechanical forces (driven by the hydrological cycle)[@Sephton2005; @Meyer2008; @Algeo2010; @Sun2018]. Indeed, a coeval change in both lithium (Li) concentrations and Li isotope ratios has been interpreted as a pre-extinction increase in weathering[@Sun2018]. Subsequently, a change in eruption style to intrusive basalt emplacement has been linked to halocarbon remobilization and exhalations leading to ozone layer depletion and consequent terrestrial plant extirpations by UV-B irradiance[@Visscher2004; @Burgess2017]. The effects of this intrusive volcanic phase on land-plant communities have therefore been related to reduced soil stability[@Ward2000; @Sephton2005; @Algeo2010]. Combined with continued greenhouse-induced global warming, and associated changes in the hydrological cycle, this situation likely led to a weathering-limited denudation regime of increased soil erosion and physical weathering, thereby loading near-shore environments with a higher sediment influx and terrestrial organics[@Sephton2005; @Nabbefeld2010c; @Algeo2010; @Schobben2015]
   
   Certain aspects of this scenario are problematic, as Siberian Traps activity spans a time interval of >1$\,$My, with 2/3 of the total volume of lava deposited ~0.3$\,$My before the main extinction pulse[@Burgess2017]. Furthermore, localized regions of dysoxia/anoxia occur prior to the mass extinction[@Cao2009; @Nabbefeld2010c; @Dustira2013], but there was a major expansion in the areal extent of these conditions at the extinction horizon[@Brennecka2011a; @Schobben2015]. The role of the precursor environmental changes prior to the main marine extinction crisis in pre-stressing communities is underexplored[@Algeo2012], and requires further knowledge of the mechanisms that drove the initiation of localized oxygen depletion and the ensuing global expansion of anoxic regions. 
 
@@ -115,16 +119,21 @@ knitr::include_graphics('figures/Fig1.png')
 # global theme settings
 theme_set(theme_classic())
 theme_replace(
-              plot.background   = element_rect(fill = 
-                                                 "transparent", color = NA),
-              panel.background  = element_rect(fill = 
-                                                 "transparent", color = NA),
-              legend.background = element_rect(fill = 
-                                                 "transparent", color = NA),
-              axis.text.x = element_text(vjust = 0.8),
-              strip.background = element_rect(fill = 
-                                                "transparent", color = NA),
-              strip.placement = "outside")
+              plot.background   = element_rect(fill = "transparent", 
+                                               color = NA
+                                               ),
+              panel.background  = element_rect(fill = "transparent", 
+                                               color = NA
+                                               ),
+              legend.background = element_rect(fill = "transparent", 
+                                               color = NA
+                                               ),
+              strip.background = element_rect(fill = "transparent", 
+                                              color = NA
+                                              ),
+              strip.placement = "outside",
+              axis.text.x = element_text(vjust = 0.5)
+              )
 
 
 # default ggplot color generator
@@ -157,12 +166,13 @@ plot.els$glauc <- all.CD.long %>%
                             section == "Deltadalen") %>% 
                      select(section, height) %>% 
                      group_by(section) %>% 
-                     mutate(glauc = case_when(section == "Festningen" & 
-                                                between(height, 
-                                                        0, 
-                                                        4.77) ~ "glauconite",
-                                              section == "Deltadalen" & 
-                                                height > 90 ~ "glauconite"))
+                     mutate(glauc = 
+                              case_when(section == "Festningen" & 
+                                        between(height, 0,4.77) ~ "glauconite",
+                                        section == "Deltadalen" & 
+                                        height > 90 ~ "glauconite"
+                                        )
+                            )
 
 
 # rectangle annotation function
@@ -233,9 +243,13 @@ range.1 <- plot.1 %>%
               ungroup() %>% 
               group_by(section) %>% 
               mutate(value = if_else(height == min(height, na.rm = TRUE),
-                                     0, value)
+                                     0, 
+                                     value
+                                     )
                      ) %>% 
              ungroup()
+
+
 
 # Festningen                                                        
 sec.select <-  "Festningen"
@@ -244,7 +258,7 @@ plot.1.f <- plot.1 %>%
               ggplot( . , aes(y = height, x = value)) +  
               geom_blank(data = range.1 %>% 
                            filter(section == sec.select), 
-                         aes(y = height, x = value))  
+                         aes(y = height, x = value)) 
 
 plot.1.f_pr <- plot.1.f + 
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
@@ -261,13 +275,16 @@ plot.1.f_pr <- plot.1.f +
                               ymin = ymin, ymax = ymax),
                           inherit.aes = FALSE, 
                           fill = "lightgrey",
-                          alpha = 0.3, color = "transparent") +
+                          alpha = 0.3, 
+                          color = "transparent"
+                          ) +
                 plot.els$PTX_hor_f +
                 geom_vline(data = plot.els$anox, 
                            aes(xintercept = value,
                            color = state), 
                            linetype = 3, 
-                           size = 0.8) +  
+                           size = 0.8
+                           ) +  
                 geom_text(data = tibble(x = 0, 
                                         y = 10,
                                         phase = factor("HR_FeT", 
@@ -277,30 +294,44 @@ plot.1.f_pr <- plot.1.f +
                           aes(x = x, 
                               y = y, 
                               label = text.lab),
-                          inherit.aes = FALSE, angle = 90) +
+                          inherit.aes = FALSE, 
+                          angle = 90,
+                          size = 3
+                          ) +
                 geom_segment(data = tibble(x = 0.1, 
                                            y = 10,
                                            xend = 0.3, 
                                            yend = 10,
-                                           phase = factor("HR_FeT",
-                                                       levels = c("HR_FeT"),
-                                                    c(bquote(Fe[HR]/Fe[tot])))),
+                                           phase = 
+                                             factor("HR_FeT",
+                                                    levels = c("HR_FeT"),
+                                                    c(bquote(Fe[HR]/Fe[tot])
+                                                      )
+                                                    )
+                                           ),
                             aes(x = x, 
                                 y = y, 
                                 xend = xend, 
                                 yend = yend),
                             arrow = arrow(angle = 30, 
-                                          length = unit(0.1, "cm")))+
+                                          length = unit(0.1, "cm")
+                                          )
+                            )+
                   geom_text(data = plot.els$anox,
                             aes(x = pos.x, 
                                 y = pos.y, 
-                                label = text.lab),
-                                angle = 90) +
-                geom_point(aes(fill = corr), shape = 21) +
+                                label = text.lab
+                                ),
+                            angle = 90,
+                            size = 3
+                            ) +
+                geom_point(aes(fill = corr), shape = 21, size = 1.2) +
                 scale_fill_manual(values = c("uncorr" = "white",  
                                              "corr" = "black")) +
                 scale_y_continuous(expand = expand_scale(mult = c(0,0))) + 
                 plot.els$norm 
+
+
                  
 # d13C
 range.d13C <- c(-35, -23)
@@ -313,7 +344,7 @@ plot.d13C.f <- all.CD.long %>%
                 ggplot( . , aes(y = height, x = value)) +
                 
                 plot.els$PTX_hor_f +
-                geom_point() +
+                geom_point(size = 1.2) +
                 scale_x_continuous(limits = range.d13C, 
                                    breaks = seq(range.d13C[1], range.d13C[2], 
                                                 by = 2))+
@@ -323,13 +354,13 @@ plot.d13C.f <- all.CD.long %>%
                            labeller = label_parsed) +
                 plot.els$norm + 
                 annotate("text", label= "extinction \n horizon", 
-                         y = -2.5, x = -31.5 , size = 3.5) +
+                         y = -2.5, x = -31.5 , size = 2.5) +
                 annotate("text", label = "shale", y = -11.5, x = -34, 
-                         size = 2.5, hjust = 0) +
+                         size = 2, hjust = 0.1) +
                 annotate("text", label = "chert", y = -17.5, x = -34, 
-                         size = 2.5, hjust = 0) +
+                         size = 2, hjust = 0.1) +
                 annotate("text", label = "fine sand", y = -23.4, x = -34, 
-                         size = 2.5, hjust = 0.23) 
+                         size = 2, hjust = 0.27) 
 
 # d34S
 range.d34S<- c(-50, 10)
@@ -341,7 +372,7 @@ plot.d34S.f <- all.CD.long %>%
                                         ))) %>% 
                 ggplot( . , aes(y = height, x = value)) +
                 plot.els$PTX_hor_f +
-                geom_point() +
+                geom_point(size = 1.2) +
                 scale_x_continuous(limits = range.d34S, 
                                    breaks = seq(range.d34S[1], range.d34S[2], 
                                                 by = 10))+
@@ -367,7 +398,7 @@ plot.gl.f <- plot.els$glauc %>%
                 scale_y_continuous(limits = range.h.f) +
                 annotate("text", label = "glauconite ", 
                          angle = 90, 
-                         size = 3, 
+                         size = 2.5, 
                          x = 1, 
                          y = -10) +
                 ggplot_grad_rects(25, -2, 30, -3.3, -2.2, "#67a9cf", 
@@ -380,11 +411,11 @@ plot.gl.f <- plot.els$glauc %>%
                                   ypos = -15) +
                 ggplot_grad_rects(25, -2, 30, -1, 0, "#d8b365", sec = 
                                     sec.select, lab.ev = 
-                                    "physical weathering/transport", 
+                                    "physical weathering", 
                                   ypos = 30) +
                 ggplot_grad_rects(25, 2, -25, -1, 0, "#d8b365", sec = 
                                     sec.select, lab.ev = 
-                                    "physical weathering/transport", 
+                                    "physical weathering", 
                                   ypos = -15) +
                 ggplot_grad_rects(25, -2, -25, -2.1, -1.1, "#5ab4ac", sec = 
                                     sec.select, lab.ev = 
@@ -401,7 +432,8 @@ plot.gl.f <- plot.els$glauc %>%
                 theme(axis.line.y = element_blank(),
                       axis.ticks.y = element_blank(),
                       axis.title.y = element_blank(),
-                      axis.text.y = element_blank())
+                      axis.text.y = element_blank()
+                      )
 
 #Deltadalen                                                        
 sec.select <-  "Deltadalen" 
@@ -409,7 +441,11 @@ plot.1.d <- plot.1 %>%
               filter(section == sec.select) %>% 
               ggplot( . , aes(y = height, x = value)) + 
               geom_blank(data = range.1 %>% filter(section == sec.select), 
-                       aes(y = height, x = value)) 
+                       aes(y = height, x = value)) +
+              theme(strip.text = element_text(size = 3),
+                    axis.text.x = element_text(size = 3)
+                    )
+
 
 plot.1.d_pr <- plot.1.d + 
                 facet_grid(cols = vars(phase),  scales = "free", switch = "x", 
@@ -435,7 +471,8 @@ plot.1.d_pr <- plot.1.d +
                            linetype = 3, 
                            size = 0.8) +  
                 plot.els$PTX_hor_d +
-                geom_point(aes(fill = corr), shape = 21) +
+                geom_point(aes(fill = corr), shape = 21,
+                           size = 1.2) +
                 scale_fill_manual(values = c("uncorr" = "white",  
                                              "corr" = "black")) +
                 scale_y_reverse(expand = expand_scale(mult = c(0,0)))+
@@ -450,7 +487,7 @@ plot.d13C.d <- all.CD.long %>%
                                         ))) %>% 
                 ggplot( . , aes(y = height, x = value)) +
                 plot.els$PTX_hor_d +
-                geom_point() +
+                geom_point(size = 1.2) +
                 scale_x_continuous(limits = range.d13C, 
                                    breaks = seq(range.d13C[1], range.d13C[2], 
                                                 by = 2))+
@@ -467,8 +504,8 @@ plot.d34S.d <- all.CD.long %>%
                                       c(bquote(delta^34*S[py]~"(\u2030 VCDT)")
                                         ))) %>% 
                 ggplot( . , aes(y = height, x = value)) +
-                geom_point() +
                 plot.els$PTX_hor_d +
+                geom_point(size = 1.2) +
                 scale_x_continuous(limits = range.d34S, 
                                    breaks = seq(range.d34S[1], range.d34S[2], 
                                                 by = 10))+
@@ -494,9 +531,9 @@ plot.gl.d <- plot.els$glauc %>%
                 geom_violin(trim = FALSE, bw = 2, fill = "#addd8e") +
                 annotate("text", label = "glauconite ", 
                          angle = 90, 
-                         size = 3, 
+                         size = 2.5, 
                          x = 1, 
-                         y = 82) +
+                         y = 81.5) +
                 ggplot_grad_rects(25, 89, 70, -3.3, -2.2, "#67a9cf", 
                                   sec = sec.select, 
                                   lab.ev = "intrusive", ypos = 85) +
@@ -505,11 +542,11 @@ plot.gl.d <- plot.els$glauc %>%
                                   lab.ev = "extrusive volcanism", ypos = 94) +
                 ggplot_grad_rects(45, 86, 99, -1, 0, "#d8b365", 
                                   sec = sec.select, 
-                                  lab.ev = "physical weathering/transport", 
+                                  lab.ev = "physical weathering", 
                                   ypos = 65) +
                 ggplot_grad_rects(25, 89, 70, -1, 0, "#d8b365", 
                                   sec = sec.select, 
-                                  lab.ev = "physical weathering/transport", 
+                                  lab.ev = "physical weatheringt", 
                                   ypos = 94) +
                 ggplot_grad_rects(45, 89, 99, -2.1, -1.1, "#5ab4ac", 
                                   sec = sec.select, 
@@ -566,8 +603,10 @@ DD   <- cbind(pg.DD,
 str_plots <- grid.arrange(DD, fest, ncol = 1)
 
 # save plots external
-ggsave(paste0(data.path, "figures/Fig2.tiff"), 
-       str_plots , height = 20, width = 23, unit = "cm")
+ggsave(paste0(data.path, "figures/Fig2.pdf"), 
+       str_plots , height = 15.7, width = 19, unit = "cm",
+       device = cairo_pdf)
+
 
 ```
 
@@ -647,7 +686,7 @@ plot.2.d_pr <- plot.2.d +
                 labs(color = expression(Fe[py]/Fe[HR])) +
                 scale_fill_continuous(limits =c(0, 1), 
                                       breaks = seq(0, 1, 0.1)) +
-                theme(axis.text = element_text(size=9),
+                theme(axis.text = element_text(size = 9),
                       legend.position = c(0.95, 0.22),
                       legend.background = element_blank(),
                       legend.key.size = unit(0.3, units = "cm"),
@@ -780,7 +819,7 @@ for(i in seq_along(pg.Grobs)){
 
 cr_plots <- grid.arrange(plot.2.d_pr, pg, nrow = 1, widths = c(2/3, 1/3)) 
                   
-ggsave("figures/Fig3.tiff", cr_plots, height = 7, width = 20, unit = "cm")
+ggsave("figures/Fig3.pdf", cr_plots, height = 7, width = 20, unit = "cm")
 
 ```
 
@@ -789,7 +828,7 @@ ggsave("figures/Fig3.tiff", cr_plots, height = 7, width = 20, unit = "cm")
    
   The spatio-temporal variability in water column redox implies the existence of dysoxic conditions on the shallow shelf prior to the extinction horizon (Fig. \@ref(fig:FigStrat)). Subsequently, at the extinction horizon, euxinic conditions developed on the shallower shelf (Deltadalen), and dysoxic to ferruginous conditions expanded into more distal deeper shelf settings (Festningen). This was followed by the expansion of anoxia across the shelf, specifically with euxinic conditions becoming more widespread (at least intermittently) in the post-extinction Early Triassic. The S isotope composition of pyrite provides additional support for this redox reconstruction. Generally light and quite variable pyrite  $\delta$^34^S values (`r round(all.CD.long %>% filter(section == "Festningen" & phase == "d34S" & height < 0) %>%  summarise(av  = mean(value)) %>% pull(av), 1)` ± `r round(all.CD.long %>% filter(section == "Festningen" & phase == "d34S" & height < 0) %>%  summarise(sd  = sd(value)) %>% pull(sd), 1)`‰) prior to the extinction horizon at the more distal locality (Fig. \@ref(fig:FigStrat)) are consistent with low rates of microbial sulfate reduction in sediments deposited beneath an oxic water column[@Lyons1997]. By contrast, heavier $\delta$^34^S~py~ where glauconite is prevalent, both in the lower section of the more proximal locality (`r round(all.CD.long %>% filter(section == "Deltadalen" & phase == "d34S" & height > 87) %>% drop_na() %>%  summarise(av  = mean(value)) %>% pull(av), 1)` ± `r round(all.CD.long %>% filter(section == "Deltadalen" & phase == "d34S" & height > 87) %>% drop_na() %>%  summarise(sd  = sd(value)) %>% pull(sd), 1)`‰)  and just above the extinction horizon at the more distal locality (`r round(all.CD.long %>% filter(section == "Festningen" & phase == "d34S" , between(height, 0, 3)) %>%  summarise(av  = mean(value)) %>% pull(av), 1)` ± `r round(all.CD.long %>% filter(section == "Festningen" & phase == "d34S" , between(height, 0, 3)) %>%  summarise(sd  = sd(value)) %>% pull(sd), 1)`‰), suggests more complete consumption of sulfate, possibly linked to temporal and spatial variability in sulfate concentrations across the transect. Particularly in the case of the distal glauconite-rich horizon, relatively heavy $\delta$^34^S~py~ may be due to significant drawdown of the continental sulfate flux under euxinic conditions on the more proximal shelf. However, under euxinic conditions at both sites, $\delta$^34^S~py~ values cluster around a narrow range (`r round(bind_rows(all.CD.long %>% filter(section == "Deltadalen" & phase == "d34S" & height < 86) %>% drop_na(), all.CD.long %>% filter(section == "Festningen" & phase == "d34S" & height > 5)) %>%  summarise(av  = mean(value)) %>% pull(av), 1)` ± `r round(bind_rows(all.CD.long %>% filter(section == "Deltadalen" & phase == "d34S" & height < 86) %>% drop_na(), all.CD.long %>% filter(section == "Festningen" & phase == "d34S" & height > 5)) %>%  summarise(sd  = sd(value)) %>% pull(sd), 1)`‰), which is entirely consistent with the narrow range commonly found in modern and ancient euxinic settings[@Lyons1997; @Shen2002].
   
-  We use our phosphorus data to test two scenarios that are compatible with environmental change at the extinction horizon and our independent proxy data. Firstly, the Fe~HR~ flux from the continent may have dropped (as recorded by a decrease in glauconite at Deltadalen; Fig. \@ref(fig:FigStrat)) proportional to the sulfate influx with the switch to deforestation, soil erosion and increased physical weathering[@Sephton2005; @Algeo2010; @Sun2018]. Alternatively, an increase in organic carbon (C~org~) availability (Fig. \@ref(fig:FigPhos)) under eutrophic conditions on the shelf may have increased the production of H~2~S, thus overwhelming the continental supply of Fe~HR~. Both of these scenarios would initially promote enhanced production of sulfide on the more proximal continental shelf, the significance of which we consider in more detail below. 
+  We use our phosphorus data to test two scenarios that are compatible with environmental change at the extinction horizon and our independent proxy data. Firstly, the Fe~HR~ flux from the continent may have dropped (as recorded by a decrease in glauconite at Deltadalen; Fig. \@ref(fig:FigStrat)) proportional to the sulfate influx with the switch to deforestation, soil erosion and increased physical weathering[@Ward2000;@Sephton2005; @Algeo2010; @Sun2018]. Alternatively, an increase in organic carbon (C~org~) availability (Fig. \@ref(fig:FigPhos)) under eutrophic conditions on the shelf may have increased the production of H~2~S, thus overwhelming the continental supply of Fe~HR~. Both of these scenarios would initially promote enhanced production of sulfide on the more proximal continental shelf, the significance of which we consider in more detail below. 
   
 
 ```{r FigPhos,  anchor="figure", fig.width = 5.5, fig.height = 5.5, fig.cap = "Stratigraphic distribution of  P~tot~/Al, C~org~, C~org~/P~org~, and C~org~/P~reac~ ratios. The threshold of P~tot~/Al (mass ratio) is the average shale reference value[@Wedepohl1991], whereas the C/P molar ratio of 106/1 denotes the Redfield ratio, and the red circle represents an outlier (P~tot~/Al > 2.0)."}
@@ -1052,7 +1091,7 @@ DD   <- cbind(pg.DD, ggplotGrob(plot.3.d_pr), r.d, size = "first")
 str_plots <- grid.arrange(DD, fest, nrow = 2)
 
 # save plots external
-ggsave(paste0(data.path, "figures/Fig4.tiff"), 
+ggsave(paste0(data.path, "figures/Fig4.pdf"), 
        str_plots , height = 14, width = 14, unit = "cm")
 
 ```
@@ -1066,7 +1105,7 @@ ggsave(paste0(data.path, "figures/Fig4.tiff"),
 
   These factors then controlled the geochemistry of the distal, pre-extinction Festningen locality, where P~tot~/Al ratios are close to average shale, C~org~/P~org~ ratios are elevated relative to the Redfield ratio, and C~org~/P~reac~ ratios scatter close to the Redfield ratio (Fig. \@ref(fig:FigPhos)). This suggests that the high initial weathering influx of P was efficiently sequestered in more proximal settings (giving lower  P~tot~/Al in distal settings), thus limiting the spatial extent of dysoxic conditions. Furthermore, while P was released from organic matter during microbial respiration (C~org~/P~org~ > 106/1), there is little evidence for a high sustained flux back to the water column (C~org~/P~reac~ ratios fall close to the Redfield ratio), consistent with the expected behaviour of P in sediments deposited beneath an oxic water column[@Cappellen1996; @Algeo2007a]. 
 
-  At the extinction horizon, P~tot~/Al ratios decrease to average shale values at the proximal Deltadalen locality, and both C~org~/P~org~ and C~org~/P~reac~ ratios increase considerably to values that exceed the Redfield ratio (Fig. \@ref(fig:FigPhos)).This suggests that the development of euxinia fuelled efficient release of P from both organic matter and Fe (oxyhydr)oxides, and a positive productivity feedback was promoted via recycling of a significant proportion of the released phosphate back to the water column. The initial driver of euxinia is more difficult to ascertain, but was likely related to the change to a weathering-limited denudation regime (Fig. \@ref(fig:FigStrat)), thereby decreasing the land-derived influx of Fe~HR~ (consistent with the loss of glauconite at Deltadalen). This led to a tipping point whereby a relative excess of dissolved sulfate over Fe~HR~ promoted the development of euxinia[@Poulton2011]. As discussed above, an increase in eutrophication driven by an enhanced nutrient influx may also have promoted sulfide production. However, this seems a less likely explanation for the initial driver of euxinia given the fact that nutrient inputs were apparently already high (Fig. \@ref(fig:FigPhos)).  
+  At the extinction horizon, P~tot~/Al ratios decrease to average shale values at the proximal Deltadalen locality, and both C~org~/P~org~ and C~org~/P~reac~ ratios increase considerably to values that exceed the Redfield ratio (Fig. \@ref(fig:FigPhos)).This suggests that the development of euxinia fuelled efficient release of P from both organic matter and Fe (oxyhydr)oxides, and a positive productivity feedback was promoted via recycling of a significant proportion of the released phosphate back to the water column. The initial driver of euxinia is more difficult to ascertain, but was likely related to the change to a weathering-limited denudation regime[@Ward2000] (Fig. \@ref(fig:FigStrat)), thereby decreasing the land-derived influx of Fe~HR~ (consistent with the loss of glauconite at Deltadalen). This led to a tipping point whereby a relative excess of dissolved sulfate over Fe~HR~ promoted the development of euxinia[@Poulton2011]. As discussed above, an increase in eutrophication driven by an enhanced nutrient influx may also have promoted sulfide production. However, this seems a less likely explanation for the initial driver of euxinia given the fact that nutrient inputs were apparently already high (Fig. \@ref(fig:FigPhos)).  
 
   In glauconite-rich sediments immediately above the extinction horizon at the distal Festningen locality, there is an initial peak in P~tot~/Al in association with the development of dysoxic and/or ferruginous conditions. Here, our detailed P speciation analyses suggest that, as with the glauconite-rich horizon in the proximal locality, P was trapped in the sediment in association with CFA and glauconite (see Supplementary Discussion and Supplementary Fig. 8). The high P content of this horizon likely occurred due to drawdown of P that was recycled under euxinic conditions in more proximal settings, suggesting the operation of a redox-controlled nutrient shuttle across the shelf. This nutrient shuttle then drove the development of marine euxinia to its maximum extent in the aftermath of the mass extinction (Fig. \@ref(fig:FigConcept)), where wind- and density-driven water circulation on the shelf would support upward transport of recycled P, and thus sustained deoxygenation[@Meyer2008]. At Festningen, however, the development of only weak or intermittent euxinia after the P--Tr boundary restricted the extent of P recycling to the water column (C~org~/P~reac~ scatters around the Redfield ratio; Fig.  \@ref(fig:FigPhos)), which effectively constrained the maximum spatial extent of euxinia.
 
@@ -1107,5 +1146,7 @@ The authors declare no competing interests.
 ## Data and Code Availability
 
 Both raw and processed geochemical data are provided as an online supplement (Zenodo: <https://doi.org/xxx>). The Rmarkdown files can be used to reproduce the data analysis as well as generating the accompanying data figures and the main and supplementary information texts.
+
+**Correspondence** should be addressed to MS (m.a.n.schobben@uu.nl). PBW (P.B.Wignall@leeds.ac.uk) and SP (planke@vbpr.no) should be consulted for **material requests**.
 
 ## References
