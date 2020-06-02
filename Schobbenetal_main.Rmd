@@ -432,7 +432,8 @@ plot.gl.f <- plot.els$glauc %>%
                 theme(axis.line.y = element_blank(),
                       axis.ticks.y = element_blank(),
                       axis.title.y = element_blank(),
-                      axis.text.y = element_blank()
+                      axis.text.y = element_blank(),
+                      title = element_text(size = 8)
                       )
 
 #Deltadalen                                                        
@@ -563,7 +564,8 @@ plot.gl.d <- plot.els$glauc %>%
                 theme(axis.line.y = element_blank(),
                       axis.ticks.y = element_blank(),
                       axis.title.y = element_blank(),
-                      axis.text.y = element_blank())
+                      axis.text.y = element_blank(),
+                      title = element_text(size = 8))
 
 # Remove clipping panel from grobs with section name annotate
 pg.fest$layout$clip[pg.fest$layout$name == "panel"] <- "off"
