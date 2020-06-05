@@ -5,15 +5,17 @@
 
 <!-- badges: end -->
 
-To recreate the article: *A nutrient-driven tipping point catalysed
-marine anoxia during the end-Permian mass extinction*, published in
-*Nature Geoscience*, run the R Markdown file (.Rmd) with *knitr* (Xie
-2020, 2015, 2014; Allaire et al. 2020; Xie, Allaire, and Grolemund 2018)
-on the programming platform R (R Core Team 2020). Instructions on the
-installation and the usage of Rmarkdown for Rstudio can be found on the
-website: <https://rmarkdown.rstudio.com/>. Several additional packages
-are required to recreate data processing, statistics and visualization
-of the geochemical datasets and geographic maps, including:*bibtex*
+# Introduction
+
+To recreate the article: *A nutrient control on marine anoxia during the
+end-Permian mass extinction*, published in *Nature Geoscience*, run the
+R Markdown files (.Rmd) with *knitr* (Xie 2020, 2015, 2014; Allaire et
+al. 2020; Xie, Allaire, and Grolemund 2018) on the programming platform
+R (R Core Team 2020). Instructions on the installation and the usage of
+Rmarkdown for Rstudio can be found on the website:
+<https://rmarkdown.rstudio.com/>. Several additional packages are
+required to recreate data processing, statistics and visualization of
+the geochemical datasets and geographic maps, including:*bibtex*
 (Francois 2017), *Cairo* (Urbanek and Horner 2019), *gtable* (Wickham
 and Pedersen 2019), *gridExtra* (Auguie 2017), *png* (Urbanek 2013),
 *lattice* (Sarkar 2008), RColorBrewer (Neuwirth 2014), *readxl* (Wickham
@@ -24,6 +26,14 @@ The library *marelac* (Soetaert and Petzoldt 2018) was used for chemical
 data transformations. Complete the pathway to approriate directory on
 lines 6, 7 and 78 of *Schobbenetal\_main.Rmd* and lines 6, 7 and 82 of
 *Schobbenetal\_SI.Rmd* before rendering the files\[1\].
+
+# Structure
+
+The structure of this repository is as follows:
+
+  - **data-raw**: contains the raw data files
+  - **datafiles**: contains proccesed data files
+  - **style**: contains templates for formatting
 
 # References
 

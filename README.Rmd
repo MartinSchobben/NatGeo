@@ -85,7 +85,17 @@ file.remove("packages.bib", "rversion.bib") %>%
 
 ```
 
-To recreate the article: *A nutrient-driven tipping point catalysed marine anoxia during the end-Permian mass extinction*, published in *Nature Geoscience*, run the R Markdown file (.Rmd) with *knitr* [@knitr1; @knitr2; @knitr3; @rmarkdown1; @rmarkdown2] on the programming platform R [@rversion].  Instructions on the installation and the usage of Rmarkdown for Rstudio can be found on the website: https://rmarkdown.rstudio.com/. Several additional packages are required to recreate data processing, statistics and visualization of the geochemical datasets and geographic maps, including:*bibtex* [@bibtex], *Cairo* [@Cairo], *gtable* [@gtable], *gridExtra* [@gridExtra], *png* [@png], *lattice* [@lattice], RColorBrewer [@RColorBrewer],  *readxl* [@readxl], *rgdal* [@rgdal], *rgeos* [@rgeos], *sp* [@sp1; @sp2], and *tidyverse* [@tidyverse]. The library *marelac* [@marelac] was used for chemical data transformations. Complete the pathway to approriate directory on lines 6, 7 and 78 of *Schobbenetal_main.Rmd* and lines 6, 7 and 82 of *Schobbenetal_SI.Rmd* before rendering the files[^r_version].
+# Introduction
+To recreate the article: *A nutrient control on marine anoxia during the end-Permian mass extinction*, published in *Nature Geoscience*, run the R Markdown files (.Rmd) with *knitr* [@knitr1; @knitr2; @knitr3; @rmarkdown1; @rmarkdown2] on the programming platform R [@rversion].  Instructions on the installation and the usage of Rmarkdown for Rstudio can be found on the website: https://rmarkdown.rstudio.com/. Several additional packages are required to recreate data processing, statistics and visualization of the geochemical datasets and geographic maps, including:*bibtex* [@bibtex], *Cairo* [@Cairo], *gtable* [@gtable], *gridExtra* [@gridExtra], *png* [@png], *lattice* [@lattice], RColorBrewer [@RColorBrewer],  *readxl* [@readxl], *rgdal* [@rgdal], *rgeos* [@rgeos], *sp* [@sp1; @sp2], and *tidyverse* [@tidyverse]. The library *marelac* [@marelac] was used for chemical data transformations. Complete the pathway to approriate directory on lines 6, 7 and 78 of *Schobbenetal_main.Rmd* and lines 6, 7 and 82 of *Schobbenetal_SI.Rmd* before rendering the files[^r_version].
+
+# Structure
+
+The structure of this repository is as follows:
+
+- **data-raw**: contains the raw data files
+- **datafiles**: contains proccesed data files
+- **style**: contains templates for formatting
+
 
 [^r_version]: `r version$version.string`, with: `r paste(lapply(sort(packages), packages_versions), collapse = ", ")`.
 
