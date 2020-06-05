@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
 
+[![DOI](https://zenodo.org/badge/236938503.svg)](https://zenodo.org/badge/latestdoi/236938503)
 <!-- badges: end -->
 
 # Introduction
